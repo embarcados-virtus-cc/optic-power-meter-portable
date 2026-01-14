@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
-set(PICO_SDK_PATH "/home/alexandrejunior/pico-sdk")
 
 set(PICO_BOARD pico_w CACHE STRING "Board type")
 

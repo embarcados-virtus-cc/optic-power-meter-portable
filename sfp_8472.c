@@ -76,6 +76,36 @@ sfp_identifier_t sfp_a0_get_identifier(const sfp_a0h_base_t *a0)
     return a0->identifier;
 }
 
+/*
+ * RF-02: Byte 1 — Extended Identifier
+ */
+void sfp_parse_a0_base_ext_identifier(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    a0->ext_identifier = a0_base_data[1];  // Byte 1
+}
+
+uint8_t sfp_a0_get_ext_identifier(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return 0x00;
+
+    return a0->ext_identifier;
+}
+
+bool sfp_rf02_validate_ext_identifier(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return false;
+
+    return (a0->ext_identifier == SFP_EXT_IDENTIFIER_EXPECTED);
+}
+
+
+
+
 void sfp_read_compliance(const uint8_t *a0_base_data, sfp_compliance_codes_t *cc)
 {
     if (!a0_base_data || !cc)

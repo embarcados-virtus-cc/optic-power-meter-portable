@@ -377,6 +377,13 @@ bool sfp_read_block(i2c_inst_t *i2c,uint8_t dev_addr,uint8_t start_offset,uint8_
 void sfp_parse_a0_base_identifier(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);
 sfp_identifier_t sfp_a0_get_identifier(const sfp_a0h_base_t *a0);
 
+/* RF-02 — Byte 1 (Extended Identifier) */
+#define SFP_EXT_IDENTIFIER_EXPECTED 0x04
+
+void sfp_parse_a0_base_ext_identifier(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+uint8_t sfp_a0_get_ext_identifier(const sfp_a0h_base_t *a0);
+bool sfp_rf02_validate_ext_identifier(const sfp_a0h_base_t *a0);
+
 /* Byte 3-10 Compliance Codes */
 void sfp_read_compliance(const uint8_t *a0_base_data, sfp_compliance_codes_t *cc);
 static void decode_byte3(const sfp_compliance_codes_t *cc, sfp_compliance_decoded_t *out);
