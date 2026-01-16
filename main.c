@@ -210,7 +210,7 @@ int main(void)
     sfp_print_compliance(&comp);
 
     /* =====================================================
-     * Teste do Byte 11 — Encoding (ADICIONADO)
+     * Teste do Byte 11 — Encoding
      * ===================================================== */
     sfp_encoding_codes_t encoding_code = sfp_a0_get_encoding(&a0); 
     
