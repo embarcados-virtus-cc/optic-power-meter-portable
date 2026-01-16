@@ -126,10 +126,10 @@ int main(void)
     /* Inicialização da UART USB */
     stdio_init_all();
 
-    /*Tempo para conectar ao um Leitor Serial*/
+    /* Tempo para conectar ao um Leitor Serial */
     sleep_ms(2000);
 
-    printf("=== Teste SFP A0h (Byte 0, Byte 17, Byte 18, Byte 3-10 e Byte 36) ===\n");
+    printf("=== Teste SFP A0h (Bytes 0, 3-10, 11, 16, 17, 18 e 36) ===\n");
 
     /* Inicializa I2C */
     sfp_i2c_init(
@@ -162,11 +162,13 @@ int main(void)
     /* Estrutura interpretada */
     sfp_a0h_base_t a0 = {0};
 
-    /* Parsing do bloco (Testado) */
+    /* Parsing do bloco */
     sfp_parse_a0_base_identifier(a0_base_data, &a0);
     sfp_parse_a0_base_om1(a0_base_data, &a0);
+    sfp_parse_a0_base_om2(a0_base_data, &a0);
     sfp_parse_a0_base_om4_or_copper(a0_base_data, &a0);
     sfp_parse_a0_base_ext_compliance(a0_base_data, &a0);
+    sfp_parse_a0_base_encoding(a0_base_data, &a0); /* Byte 11 */
 
     /* =====================================================
      * Teste do Byte 0 — Identifier
@@ -208,6 +210,34 @@ int main(void)
 
     sfp_print_compliance(&comp);
 
+    /* =====================================================
+     * Teste do Byte 11 — Encoding
+     * ===================================================== */
+    sfp_encoding_codes_t encoding_code = sfp_a0_get_encoding(&a0); 
+    
+    sfp_print_encoding(encoding_code);
+    
+    /* =====================================================
+     * Teste do Byte 16 — Length OM2 (50 µm)
+     * ===================================================== */
+    sfp_om2_length_status_t om2_status;
+    uint16_t om2_length_m = sfp_a0_get_om2_length_m(&a0, &om2_status);
+
+    printf("\nByte 16 — Length OM2 (50 µm)\n");
+
+    switch (om2_status) {
+    case SFP_OM2_LEN_VALID:
+        printf("Alcance OM2 válido: %u metros\n", om2_length_m);
+        break;
+    case SFP_OM2_LEN_EXTENDED:
+        printf("Alcance OM2 superior a %u metros (>2.54 km)\n", om2_length_m);
+        break;
+    case SFP_OM2_LEN_NOT_SUPPORTED:
+    default:
+        printf("Alcance OM2 não especificado ou não suportado\n");
+        break;
+    }
+    
     /* =====================================================
      * Teste do Byte 17 — Length OM1 (62.5 µm)
      * ===================================================== */

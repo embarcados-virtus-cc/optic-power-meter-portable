@@ -332,6 +332,119 @@ void sfp_print_compliance(const sfp_compliance_decoded_t *c)
     if (c->cs_100_mbps)  printf("  - 100 Mbps\n");
 }
 
+void sfp_parse_a0_base_encoding(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    a0->encoding = (sfp_encoding_codes_t)a0_base_data[11];
+}
+
+sfp_encoding_codes_t sfp_a0_get_encoding(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return SFP_ENC_UNSPECIFIED;
+
+    return a0->encoding;
+}
+
+void sfp_print_encoding(sfp_encoding_codes_t encoding)
+{
+    printf("\n[Byte 11] Encoding:\n");
+
+    switch ((uint8_t)encoding) {
+        case SFP_ENC_UNSPECIFIED:
+            printf("  - Unspecified\n");
+            break;
+        case SFP_ENC_8B_10B:
+            printf("  - 8B/10B\n");
+            break;
+        case SFP_ENC_4B_5B:
+            printf("  - 4B/5B\n");
+            break;
+        case SFP_ENC_NRZ:
+            printf("  - NRZ\n");
+            break;
+        case SFP_ENC_MANCHESTER:
+            printf("  - Manchester\n");
+            break;
+        case SFP_ENC_SONET_SCRAMBLED:
+            printf("  - SONET Scrambled\n");
+            break;
+        case SFP_ENC_64B_66B:
+            printf("  - 64B/66B\n");
+            break;
+        case SFP_ENC_256B_257B:
+            printf("  - 256B/257B\n");
+            break;
+        case SFP_ENC_PAM4:
+            printf("  - PAM4\n");
+            break;
+        default:
+            printf("  - Reserved / Unknown Code (0x%02X)\n", (uint8_t)encoding);
+            break;
+    }
+}
+
+/*
+ * Parsing do Byte 16 (OM2, 50 µm)
+ */
+void sfp_parse_a0_base_om2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    /* =========================================================
+     * Byte 16 — Length (OM2, 50 µm)
+     * =========================================================*/
+    uint8_t raw = a0_base_data[16];
+
+    /*
+     * Fluxo Principal + Secundários
+     */
+    if (raw == 0x00) {
+        /*
+         * Fluxo Secundário 2 (caso 00h):
+         * Não suportado ou deve ser determinado por outros meios.
+         */
+        a0->om2_status   = SFP_OM2_LEN_NOT_SUPPORTED;
+        a0->om2_length_m = 0;
+    }
+    else if (raw == 0xFF) {
+        /*
+         * Fluxo Secundário 2 (caso FFh):
+         * Alcance > 2.54 km.
+         */
+        a0->om2_status   = SFP_OM2_LEN_EXTENDED;
+        a0->om2_length_m = 2540; /* Limite inferior conhecido (254 * 10) */
+    }
+    else {
+        /*
+         * Fluxo Principal:
+         * Valor válido (01h–FEh)
+         * Unidade: 10 metros
+         */
+        a0->om2_status   = SFP_OM2_LEN_VALID;
+        a0->om2_length_m = (uint16_t)raw * 10;
+    }
+}
+
+/*
+ * Getter simples para OM2
+ */
+uint16_t sfp_a0_get_om2_length_m(const sfp_a0h_base_t *a0, sfp_om2_length_status_t *status)
+{
+    if (!a0) {
+        if (status)
+            *status = SFP_OM2_LEN_NOT_SUPPORTED;
+        return 0;
+    }
+
+    if (status)
+        *status = a0->om2_status;
+
+    return a0->om2_length_m;
+}
 
 void sfp_parse_a0_base_om1(const uint8_t *a0_base_data,sfp_a0h_base_t *a0)
 {
