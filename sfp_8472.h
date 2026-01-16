@@ -58,6 +58,30 @@ typedef enum {
     SFP_ID_QSFP28    = 0x18
 } sfp_identifier_t;
 
+/* ==============================
+ * Byte 11 — Encoding values
+ * ============================== */
+typedef enum {
+    SFP_ENC_UNSPECIFIED = 0x00,
+    SFP_ENC_8B_10B = 0x01,
+    SFP_ENC_4B_5B = 0x02,
+    SFP_ENC_NRZ = 0x03,
+    SFP_ENC_MANCHESTER = 0x04,
+    SFP_ENC_SONET_SCRAMBLED = 0x05,
+    SFP_ENC_64B_66B = 0x06,
+    SFP_ENC_256B_257B = 0x07,
+    SFP_ENC_PAM4 = 0x08,
+} sfp_encoding_codes_t;
+
+/*
+ * Status da informação de alcance OM2
+ */
+typedef enum {
+    SFP_OM2_LEN_NOT_SUPPORTED,   /* Byte 16 = 0x00 */
+    SFP_OM2_LEN_VALID,           /* 0x01–0xFE */
+    SFP_OM2_LEN_EXTENDED         /* Byte 16 = 0xFF */
+} sfp_om2_length_status_t;
+
 /*
  * Status da informação de alcance OM1
  */
@@ -195,7 +219,7 @@ typedef struct {
     uint8_t connector;            // SFF-8024
 
     /* Byte 11: Encoding */
-    uint8_t encoding;             // SFF-8024
+    sfp_encoding_codes_t encoding;            // SFF-8024
 
     /* Byte 12: Signaling Rate, Nominal */
     uint8_t nominal_rate;         // Units of 100 MBd
@@ -203,6 +227,9 @@ typedef struct {
     /* Byte 13: Rate Identifier */
     uint8_t rate_identifier;      // Table 5-6
 
+    /*Byte 16: 50 um OM2*/
+    uint16_t om2_length_m;           /* Distância convertida (metros) */
+    sfp_om2_length_status_t om2_status;
 
     /*Byte 17: 62.5 um OM1*/
     uint16_t om1_length_m;           /* Distância convertida (metros) */
@@ -370,8 +397,6 @@ bool sfp_i2c_init(i2c_inst_t *i2c, uint sda, uint scl, uint baudrate);
 /* Memory Access */
 bool sfp_read_block(i2c_inst_t *i2c,uint8_t dev_addr,uint8_t start_offset,uint8_t *buffer,uint8_t length);
 
-
-
 /* Functions */
 
 void sfp_parse_a0_base_identifier(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);
@@ -389,6 +414,15 @@ static void decode_byte9(const sfp_compliance_codes_t *cc, sfp_compliance_decode
 static void decode_byte10(const sfp_compliance_codes_t *cc, sfp_compliance_decoded_t *out);
 void sfp_decode_compliance(const sfp_compliance_codes_t *cc, sfp_compliance_decoded_t *out);
 void sfp_print_compliance(const sfp_compliance_decoded_t *c);
+
+/* Byte 11 Encoding */
+void sfp_read_encoding(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+sfp_encoding_codes_t sfp_a0_get_encoding(const sfp_a0h_base_t *a0_base_data);
+void sfp_print_encoding(sfp_encoding_codes_t encoding);
+
+/* Byte 16 OM2 Length Status (50 um)*/
+void sfp_parse_a0_base_om2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+uint16_t sfp_a0_get_om2_length_m(const sfp_a0h_base_t *a0, sfp_om2_length_status_t *status);
 
 /* Byte 17 OM1 (62.5 um) */
 void sfp_parse_a0_base_om1(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);

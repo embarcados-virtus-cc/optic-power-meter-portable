@@ -126,10 +126,10 @@ int main(void)
     /* Inicialização da UART USB */
     stdio_init_all();
 
-    /*Tempo para conectar ao um Leitor Serial*/
+    /* Tempo para conectar ao um Leitor Serial */
     sleep_ms(2000);
 
-    printf("=== Teste SFP A0h (Byte 0, Byte 17, Byte 18, Byte 3-10 e Byte 36) ===\n");
+    printf("=== Teste SFP A0h (Bytes 0, 3-10, 11, 17, 18 e 36) ===\n");
 
     /* Inicializa I2C */
     sfp_i2c_init(
@@ -162,11 +162,12 @@ int main(void)
     /* Estrutura interpretada */
     sfp_a0h_base_t a0 = {0};
 
-    /* Parsing do bloco (Testado) */
+    /* Parsing do bloco */
     sfp_parse_a0_base_identifier(a0_base_data, &a0);
     sfp_parse_a0_base_om1(a0_base_data, &a0);
     sfp_parse_a0_base_om4_or_copper(a0_base_data, &a0);
     sfp_parse_a0_base_ext_compliance(a0_base_data, &a0);
+    sfp_read_encoding(a0_base_data, &a0); /* Byte 11 */
 
     /* =====================================================
      * Teste do Byte 0 — Identifier
@@ -207,6 +208,13 @@ int main(void)
     sfp_decode_compliance(&cc, &comp);
 
     sfp_print_compliance(&comp);
+
+    /* =====================================================
+     * Teste do Byte 11 — Encoding (ADICIONADO)
+     * ===================================================== */
+    sfp_encoding_codes_t encoding_code = sfp_a0_get_encoding(&a0); 
+    
+    sfp_print_encoding(encoding_code);
 
     /* =====================================================
      * Teste do Byte 17 — Length OM1 (62.5 µm)
