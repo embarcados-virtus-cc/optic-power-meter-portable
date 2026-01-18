@@ -618,3 +618,51 @@ sfp_extended_spec_compliance_code_t sfp_a0_get_ext_compliance(const sfp_a0h_base
 
     return a0->ext_compliance;
 }
+
+/*
+ * Faz a validação do checksum CC_BASE (Byte 63).
+ * 
+ * O checksum é calculado como a soma dos bytes 0 a 62 (inclusive) mais o byte 63
+ * deve resultar em 0 (ou seja, a soma de todos os bytes 0 a 63 deve ser 0 mod 256).
+ * 
+ * @param a0_base_data Ponteiro para o array de dados A0h (64 bytes)
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde o resultado será armazenado
+ */
+void sfp_parse_a0_base_cc_base(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    /* Calcula a soma dos bytes 0 a 62 */
+    uint16_t sum = 0;
+    for (int i = 0; i < 63; i++) {
+        sum += a0_base_data[i];
+    }
+
+    /* Converte para 8 bits (modulo 256) */
+    uint8_t sum_mod256 = (uint8_t)(sum & 0xFF);
+
+    /* Adiciona o byte 63 (CC_BASE) */
+    uint8_t checksum_byte = a0_base_data[63];
+
+    /* Verifica se a soma total é  igual ao checksum*/
+   a0->cc_base_is_valid = (sum_mod256 == checksum_byte);
+
+    /* Armazena o byte do checksum para referência */
+    a0->cc_base = checksum_byte;
+}
+
+/*
+ * Retorna o status de validação do checksum CC_BASE.
+ * 
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t
+ * @return true se o checksum é válido, false caso contrário
+ */
+bool sfp_a0_get_cc_base_is_valid(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return false;
+
+    return a0->cc_base_is_valid;
+}
+

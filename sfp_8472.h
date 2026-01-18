@@ -280,6 +280,9 @@ typedef struct {
 
     /* Byte 63: CC_BASE (Checksum) */
     uint8_t cc_base;
+
+    /* CC_BASE Validation */
+    bool cc_base_is_valid;
 } sfp_a0h_base_t;
 
 /* Bytes 3-10: Transceiver Compliance Codes */
@@ -437,6 +440,10 @@ uint16_t sfp_a0_get_om4_copper_or_length_m(const sfp_a0h_base_t *a0, sfp_om4_len
 /*Byte 36 Extended Compliance Codes) */
 void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 sfp_extended_spec_compliance_code_t sfp_a0_get_ext_compliance(const sfp_a0h_base_t *a0);
+
+/* Byte 63 CC_BASE (Checksum) */
+void sfp_parse_a0_base_cc_base(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+bool sfp_a0_get_cc_base_is_valid(const sfp_a0h_base_t *a0);
 
 
 #endif /* SFF_8472_H */

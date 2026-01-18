@@ -169,6 +169,7 @@ int main(void)
     sfp_parse_a0_base_om4_or_copper(a0_base_data, &a0);
     sfp_parse_a0_base_ext_compliance(a0_base_data, &a0);
     sfp_parse_a0_base_encoding(a0_base_data, &a0); /* Byte 11 */
+    sfp_parse_a0_base_cc_base(a0_base_data, &a0);  /* Byte 63 */
 
     /* =====================================================
      * Teste do Byte 0 — Identifier
@@ -290,6 +291,20 @@ int main(void)
 
     /* Mostrar o valor bruto do byte 36*/
     printf("Valor bruto (Byte 36): 0x%02X\n", a0_base_data[36]);
+
+    /* =====================================================
+     * Teste do Byte 63 — CC_BASE (Checksum)
+     * ===================================================== */
+    bool cc_base_valid = sfp_a0_get_cc_base_is_valid(&a0);
+
+    printf("\nByte 63 — CC_BASE (Checksum):\n");
+    printf("Valor: 0x%02X\n", a0_base_data[63]);
+    
+    if (cc_base_valid) {
+        printf("Status: ✓ Checksum VÁLIDO\n");
+    } else {
+        printf("Status: ✗ Checksum INVÁLIDO\n");
+    }
 
 #ifdef DEBUG
     /* Dump (opcional) para inspeção manual */
