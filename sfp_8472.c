@@ -666,3 +666,74 @@ bool sfp_a0_get_cc_base_is_valid(const sfp_a0h_base_t *a0)
     return a0->cc_base_is_valid;
 }
 
+/*  
+*   Realiza o parsing do Byte 2 (conector Type)
+*
+*   @param a0_base_data Ponteiro para o buffer contendo os dados lidos
+*   da EEPROM A0h (mínimo de 3 bytes válidos)
+*   @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde as
+*        informações do conector serão armazenadas.
+*
+*   @return Nenhum
+*
+*   
+*/
+void sfp_parse_a0_base_connector(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    a0->connector_raw = a0_base_data[2];
+
+    a0->connector = (sfp_connector_type_t)a0->connector_raw;
+}
+
+
+/*
+*    Obtém o tipo de conector do módulo SFP/SFP+.
+*    
+*    @param a0 Ponteiro para a estrutura sfp_a0h_base_t contendo os
+*    dados já parseados do módulo.
+*    @return Valor do tipo sfp_connector_type_t que identifica o
+*    conector físico do módulo, conforme SFF-8024.
+*/
+sfp_connector_type_t sfp_a0_get_connector(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return SFP_CONNECTOR_UNKNOWN;
+
+    return a0->connector;
+}
+
+/*
+*   Converte o tipo de conector SFP para uma representação textual.
+*   @param connector Valor do tipo sfp_connector_type_t que representa
+*   o tipo de conector físico do módulo.
+*
+*   @return Ponteiro para uma string constante contendo a descrição
+*   textual do conector. Caso o valor seja desconhecido ou
+*   não suportado, retorna "Unknown Connector".
+*/
+const char *sfp_connector_to_string(sfp_connector_type_t connector)
+{
+    switch (connector) {
+        case SFP_CONNECTOR_SC:              return "SC";
+        case SFP_CONNECTOR_FC_STYLE_1:      return "Fibre Channel Style 1";
+        case SFP_CONNECTOR_FC_STYLE_2:      return "Fibre Channel Style 2";
+        case SFP_CONNECTOR_BNC_TNC:          return "BNC/TNC";
+        case SFP_CONNECTOR_FC_COAX:          return "Fibre Channel Coax";
+        case SFP_CONNECTOR_FIBER_JACK:       return "Fiber Jack";
+        case SFP_CONNECTOR_LC:               return "LC";
+        case SFP_CONNECTOR_MT_RJ:            return "MT-RJ";
+        case SFP_CONNECTOR_MU:               return "MU";
+        case SFP_CONNECTOR_SG:               return "SG";
+        case SFP_CONNECTOR_OPTICAL_PIGTAIL:  return "Optical Pigtail";
+        case SFP_CONNECTOR_MPO_1X12:         return "MPO 1x12";
+        case SFP_CONNECTOR_MPO_2X16:         return "MPO 2x16";
+        case SFP_CONNECTOR_HSSDC_II:         return "HSSDC II";
+        case SFP_CONNECTOR_COPPER_PIGTAIL:   return "Copper Pigtail";
+        case SFP_CONNECTOR_RJ45:             return "RJ45";
+        case SFP_CONNECTOR_NO_SEPARABLE:     return "No Separable Connector";
+        default:                             return "Unknown Connector";
+    }
+}
