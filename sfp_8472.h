@@ -60,6 +60,31 @@ typedef enum {
 } sfp_identifier_t;
 
 /* ==============================
+ * Byte 2 — Connector Types
+ * SFF-8024 Table 4-3
+ * ============================== */
+typedef enum {
+    SFP_CONNECTOR_UNKNOWN          = 0x00,
+    SFP_CONNECTOR_SC                = 0x01,
+    SFP_CONNECTOR_FC_STYLE_1        = 0x02,
+    SFP_CONNECTOR_FC_STYLE_2        = 0x03,
+    SFP_CONNECTOR_BNC_TNC           = 0x04,
+    SFP_CONNECTOR_FC_COAX           = 0x05,
+    SFP_CONNECTOR_FIBER_JACK        = 0x06,
+    SFP_CONNECTOR_LC                = 0x07,
+    SFP_CONNECTOR_MT_RJ             = 0x08,
+    SFP_CONNECTOR_MU                = 0x09,
+    SFP_CONNECTOR_SG                = 0x0A,
+    SFP_CONNECTOR_OPTICAL_PIGTAIL   = 0x0B,
+    SFP_CONNECTOR_MPO_1X12          = 0x0C,
+    SFP_CONNECTOR_MPO_2X16          = 0x0D,
+    SFP_CONNECTOR_HSSDC_II          = 0x20,
+    SFP_CONNECTOR_COPPER_PIGTAIL    = 0x21,
+    SFP_CONNECTOR_RJ45              = 0x22,
+    SFP_CONNECTOR_NO_SEPARABLE      = 0x23
+} sfp_connector_type_t;
+
+/* ==============================
  * Byte 11 — Encoding values
  * ============================== */
 typedef enum {
