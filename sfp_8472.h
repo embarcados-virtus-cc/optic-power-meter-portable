@@ -4,6 +4,12 @@
  *
  * @author Alexandre Junior
  * @author Miguel Ryan
+ * @author Carlos Elias
+ * @author Pablo Daniel
+ * @author Pedro Lucena
+ * @author Nicholas Gomes
+ * @author Pedro Wilson
+ * @author Melquisedeque Leite
  * @date 2026-01-10
  *
  * @details
