@@ -66,6 +66,31 @@ typedef enum {
 } sfp_identifier_t;
 
 /* ==============================
+ * Byte 2 — Connector Types
+ * SFF-8024 Table 4-3
+ * ============================== */
+typedef enum {
+    SFP_CONNECTOR_UNKNOWN          = 0x00,
+    SFP_CONNECTOR_SC                = 0x01,
+    SFP_CONNECTOR_FC_STYLE_1        = 0x02,
+    SFP_CONNECTOR_FC_STYLE_2        = 0x03,
+    SFP_CONNECTOR_BNC_TNC           = 0x04,
+    SFP_CONNECTOR_FC_COAX           = 0x05,
+    SFP_CONNECTOR_FIBER_JACK        = 0x06,
+    SFP_CONNECTOR_LC                = 0x07,
+    SFP_CONNECTOR_MT_RJ             = 0x08,
+    SFP_CONNECTOR_MU                = 0x09,
+    SFP_CONNECTOR_SG                = 0x0A,
+    SFP_CONNECTOR_OPTICAL_PIGTAIL   = 0x0B,
+    SFP_CONNECTOR_MPO_1X12          = 0x0C,
+    SFP_CONNECTOR_MPO_2X16          = 0x0D,
+    SFP_CONNECTOR_HSSDC_II          = 0x20,
+    SFP_CONNECTOR_COPPER_PIGTAIL    = 0x21,
+    SFP_CONNECTOR_RJ45              = 0x22,
+    SFP_CONNECTOR_NO_SEPARABLE      = 0x23
+} sfp_connector_type_t;
+
+/* ==============================
  * Byte 11 — Encoding values
  * ============================== */
 typedef enum {
@@ -411,6 +436,11 @@ bool sfp_read_block(i2c_inst_t *i2c,uint8_t dev_addr,uint8_t start_offset,uint8_
 
 void sfp_parse_a0_base_identifier(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);
 sfp_identifier_t sfp_a0_get_identifier(const sfp_a0h_base_t *a0);
+
+/* Byte 2 — Connector */
+void sfp_parse_a0_base_connector(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+sfp_connector_type_t sfp_a0_get_connector(const sfp_a0h_base_t *a0);
+const char *sfp_connector_to_string(sfp_connector_type_t connector);
 
 /* Byte 3-10 Compliance Codes */
 void sfp_read_compliance(const uint8_t *a0_base_data, sfp_compliance_codes_t *cc);
