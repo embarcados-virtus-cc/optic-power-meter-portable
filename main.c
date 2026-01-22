@@ -164,6 +164,7 @@ int main(void)
 
     /* Parsing do bloco */
     sfp_parse_a0_base_identifier(a0_base_data, &a0);
+    sfp_parse_a0_base_connector(a0_base_data, &a0);
     sfp_parse_a0_base_om1(a0_base_data, &a0);
     sfp_parse_a0_base_om2(a0_base_data, &a0);
     sfp_parse_a0_base_om4_or_copper(a0_base_data, &a0);
@@ -201,19 +202,10 @@ int main(void)
     }
 
     /* ===================================
-     * Teste do Byte 2 - Leitura do Conector
+        Byte 2 - Leitura do Conector
      * =================================== */
-
-    uint8_t a0_base_data[SFP_A0_BASE_SIZE];
-    sfp_a0h_base_t sfp;
-    if (sfp_read_block(i2c, SFP_I2C_ADDR_A0,0X00,a0_base_data,SFP_A0_BASE_SIZE)) {
-    /* Parsing do Byte 2 — Connector */
-    sfp_parse_a0_base_connector(a0_base_data, &sfp);
-    printf("Connector: %s (0x%02X)\n",
-           sfp_connector_to_string(sfp.connector),
-           a0_base_data[2]);
-    }
-
+    printf("Connector: %s (0x%02X)\n",sfp_connector_to_string(a0.connector),a0_base_data[2]);
+    
     /* =============================================================
      * Teste dos Bytes 3-10 — Códigos de Conformidade do Transceptor
      * ============================================================= */
