@@ -342,6 +342,33 @@ int main(void)
     printf("Valor bruto (Byte 36): 0x%02X\n", a0_base_data[36]);
 
     /* =====================================================
+     * Teste da Task #24 (RF-19) - Fibre Channel Speed 2
+     * ===================================================== */
+    
+    /* 1. Realizar o parsing do Byte 62 */
+    sfp_parse_a0_fc_speed_2(a0_base_data, &a0);
+
+    printf("\n=== Fibre Channel Speed 2 (Byte 62) ===\n");
+    
+    /* 2. Validar dependência com Byte 10 (conforme checklist) */
+    /* Note: 'comp' já foi preenchido anteriormente por sfp_decode_compliance */
+    
+    if (comp.see_byte_62) {
+        printf("Status: Byte 10 indica capacidades estendidas.\n");
+        printf("Valor Bruto Byte 62: 0x%02X\n", a0.fc_speed2);
+
+        /* Verificar especificamente 64GFC */
+        if (sfp_check_64gfc_support(&a0, &comp)) {
+             printf("  - Suporte confirmado: 64 Gigabit Fibre Channel (64GFC)\n");
+        } else {
+             printf("  - Byte 62 lido, mas 64GFC não está ativo (Bits reservados ou proprietários).\n");
+        }
+    } else {
+        printf("Status: Byte 10 NÃO indica capacidades estendidas.\n");
+        printf("Ação: O conteúdo do Byte 62 (0x%02X) deve ser ignorado conforme SFF-8472.\n", a0.fc_speed2);
+    }
+
+    /* =====================================================
      * Teste do Byte 63 — CC_BASE (Checksum)
      * ===================================================== */
     bool cc_base_valid = sfp_a0_get_cc_base_is_valid(&a0);
