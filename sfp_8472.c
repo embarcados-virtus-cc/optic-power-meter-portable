@@ -121,6 +121,98 @@ void sfp_read_compliance(const uint8_t *a0_base_data, sfp_compliance_codes_t *cc
     cc->byte10 = a0_base_data[10];
 }
 
+/*
+ * Parsing do Byte 14 (SMF Length or Copper Attenuation)
+ * 
+ * @details
+ *  - Para fibra SMF: Representa o alcance em quilômetros (km)
+ *    Unidade: 1 km (valor 0x01 = 1 km, 0x64 = 100 km)
+ *  
+ *  - Para cabo de cobre: Representa a atenuação em dB/100m
+ *    Unidade: 0.5 dB/100m (valor 0x01 = 0.5 dB/100m)
+ *  
+ *  - Valores especiais:
+ *    0x00: Não suportado ou informação não disponível
+ *    0xFF: Valor superior ao máximo representável (> 254 km ou > 127 dB/100m)
+ */
+void sfp_parse_a0_base_smf(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    /* =========================================================
+     * Byte 14 — Length (SMF) or Attenuation (Copper)
+     * =========================================================*/
+    uint8_t raw = a0_base_data[14];
+    /* =========================================================
+     * Byte 8 — Natureza física do meio
+     * =========================================================*/
+    uint8_t byte8 = a0_base_data[8];
+
+    bool is_copper = sfp_is_copper(byte8);
+
+    /*
+     * Fluxo Principal + Secundários
+     */
+    if (raw == 0x00) {
+        /*
+         * Fluxo Secundário 2 (caso 00h):
+         * Não há informação explícita de alcance SMF ou atenuação de cobre.
+         */
+        a0->smf_status   = SFP_SMF_LEN_NOT_SUPPORTED;
+        a0->smf_length_m = 0;
+    }
+    else if (raw == 0xFF) {
+        /*
+         * Fluxo Secundário (caso FFh):
+         * Comprimento/Atenuação superior ao máximo nominal representável.
+         *
+         * - Fibra SMF: alcance > 254 km
+         * - Cabo de cobre: atenuação > 127 dB/100m
+         *
+         * O valor armazenado representa o limite inferior/superior conhecido.
+         */
+        a0->smf_status   = SFP_SMF_LEN_EXTENDED;
+
+        if (is_copper)
+            a0->smf_length_m = 254; /* 254 * 0.5 = 127 dB/100m */
+        else
+            a0->smf_length_m = 254; /* 254 km */
+    }
+    else {
+        /*
+         * Fluxo Principal:
+         * Valor válido (01h–FEh)
+         *
+         * - Fibra SMF: unidade de 1 km (valor direto)
+         * - Cabo de cobre: unidade de 0.5 dB/100m (valor * 0.5)
+         */
+        a0->smf_status   = SFP_SMF_LEN_VALID;
+        a0->smf_length_m = (uint16_t)raw;
+    }
+}
+
+/*
+ * Getter para o alcance SMF ou atenuação de cobre (Byte 14)
+ * 
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t
+ * @param status Ponteiro para armazenar o status (pode ser NULL)
+ * @return Alcance em km (SMF) ou atenuação * 2 em dB/100m (cobre)
+ */
+uint16_t sfp_a0_get_smf_length_m(const sfp_a0h_base_t *a0, sfp_smf_length_status_t *status)
+{
+    if (!a0) {
+        if (status)
+            *status = SFP_SMF_LEN_NOT_SUPPORTED;
+        return 0;
+    }
+
+    if (status)
+        *status = a0->smf_status;
+
+    return a0->smf_length_m;
+}
+
 static void decode_byte3(const sfp_compliance_codes_t *cc, sfp_compliance_decoded_t *out)
 {
     uint8_t b = cc->byte3;

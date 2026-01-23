@@ -136,6 +136,15 @@ typedef enum {
   SFP_OM4_LEN_EXTENDED          /* Byte 18 = 0xFF */
 } sfp_om4_length_status_t;
 
+/*
+ * Status da informação de alcance SMF ou atenuação de cobre (Byte 14)
+ */
+typedef enum {
+  SFP_SMF_LEN_NOT_SUPPORTED,    /* Byte 14 = 0x00 */
+  SFP_SMF_LEN_VALID,            /* Byte 14 = 0x01–0xFE */
+  SFP_SMF_LEN_EXTENDED          /* Byte 14 = 0xFF */
+} sfp_smf_length_status_t;
+
 
 /**
  * @brief Códigos de Conformidade de Especificação Estendida (Tabela 4-4 do SFF-8024)
@@ -261,6 +270,10 @@ typedef struct {
 
     /* Byte 13: Rate Identifier */
     uint8_t rate_identifier;      // Table 5-6
+
+    /* Byte 14: SMF Length or Copper Attenuation */
+    uint16_t smf_length_m;           /* Distância convertida (metros) ou atenuação (dB) */
+    sfp_smf_length_status_t smf_status;
 
     /*Byte 16: 50 um OM2*/
     uint16_t om2_length_m;           /* Distância convertida (metros) */
@@ -472,6 +485,10 @@ void sfp_print_encoding(sfp_encoding_codes_t encoding);
 /* Byte 16 OM2 Length Status (50 um)*/
 void sfp_parse_a0_base_om2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 uint16_t sfp_a0_get_om2_length_m(const sfp_a0h_base_t *a0, sfp_om2_length_status_t *status);
+
+/* Byte 14 SMF Length or Copper Attenuation */
+void sfp_parse_a0_base_smf(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+uint16_t sfp_a0_get_smf_length_m(const sfp_a0h_base_t *a0, sfp_smf_length_status_t *status);
 
 /* Byte 17 OM1 (62.5 um) */
 void sfp_parse_a0_base_om1(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);

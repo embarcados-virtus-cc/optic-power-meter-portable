@@ -168,6 +168,7 @@ int main(void)
     sfp_parse_a0_base_connector(a0_base_data, &a0);
     sfp_parse_a0_base_om1(a0_base_data, &a0);
     sfp_parse_a0_base_om2(a0_base_data, &a0);
+    sfp_parse_a0_base_smf(a0_base_data, &a0);
     sfp_parse_a0_base_om4_or_copper(a0_base_data, &a0);
     sfp_parse_a0_base_ext_compliance(a0_base_data, &a0);
     sfp_parse_a0_base_encoding(a0_base_data, &a0); /* Byte 11 */
@@ -244,6 +245,27 @@ int main(void)
     sfp_encoding_codes_t encoding_code = sfp_a0_get_encoding(&a0); 
     
     sfp_print_encoding(encoding_code);
+    
+    /* =====================================================
+     * Teste do Byte 14 — Length SMF or Copper Attenuation
+     * ===================================================== */
+    sfp_smf_length_status_t smf_status;
+    uint16_t smf_length_m = sfp_a0_get_smf_length_m(&a0, &smf_status);
+
+    printf("\nByte 14 — Length SMF or Copper Attenuation\n");
+
+    switch (smf_status) {
+    case SFP_SMF_LEN_VALID:
+        printf("Alcance SMF válido: %u km (ou atenuação: %u * 0.5 dB/100m)\n", smf_length_m, smf_length_m);
+        break;
+    case SFP_SMF_LEN_EXTENDED:
+        printf("Alcance SMF superior a %u km (ou atenuação > 127 dB/100m)\n", smf_length_m);
+        break;
+    case SFP_SMF_LEN_NOT_SUPPORTED:
+    default:
+        printf("Alcance SMF ou atenuação de cobre não especificado\n");
+        break;
+    }
     
     /* =====================================================
      * Teste do Byte 16 — Length OM2 (50 µm)
