@@ -502,6 +502,12 @@ uint16_t sfp_a0_get_om4_copper_or_length_m(const sfp_a0h_base_t *a0, sfp_om4_len
 void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 sfp_extended_spec_compliance_code_t sfp_a0_get_ext_compliance(const sfp_a0h_base_t *a0);
 
+/* Byte 37–39 Vendor OUI (IEEE Company Identifier) */
+void sfp_parse_a0_base_vendor_oui(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);
+bool sfp_a0_get_vendor_oui(const sfp_a0h_base_t *a0, uint8_t oui_buffer[3]);
+uint32_t sfp_vendor_oui_to_u32(const sfp_a0h_base_t *a0);
+
+
 /* Byte 63 CC_BASE (Checksum) */
 void sfp_parse_a0_base_cc_base(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 bool sfp_a0_get_cc_base_is_valid(const sfp_a0h_base_t *a0);

@@ -731,9 +731,67 @@ void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_
 }
 
 /*
-* Getter Simples
+* Realiza a leitura e o parsing do campo Vendor OUI da EEPROM A0h
+* @param a0_base_data Ponteiro para o buffer contendo os dados lidos da EEPROM A0h (mínimo de 40 bytes válidos).
+* @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde o Vendor OUI será armazenado.
+*
+* @return Nenhum.
 */
 
+void sfp_parse_a0_base_vendor_oui(const uint8_t *a0_base_data,
+                                  sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    /* Bytes 37–39: Vendor OUI (IEEE Company Identifier) */
+    a0->vendor_oui[0] = a0_base_data[37]; 
+    a0->vendor_oui[1] = a0_base_data[38];
+    a0->vendor_oui[2] = a0_base_data[39]; 
+}
+
+/*
+*   Obtém o Vendor OUI do módulo SFP/SFP+
+*   @param a0 Ponteiro para a estrutura sfp_a0h_base_t contendo os dados já parseados do módulo.
+*   @param oui_buffer Ponteiro para um buffer de 3 bytes onde o Vendor OUI será copiado, na ordem MSB → LSB.
+*
+*    @return true se o Vendor OUI foi copiado com sucesso.
+*    @return false se a estrutura ou o buffer de saída forem inválidos.
+*/
+bool sfp_a0_get_vendor_oui(const sfp_a0h_base_t *a0,
+                           uint8_t oui_buffer[3])
+{
+    if (!a0 || !oui_buffer)
+        return false;
+
+    oui_buffer[0] = a0->vendor_oui[0];
+    oui_buffer[1] = a0->vendor_oui[1];
+    oui_buffer[2] = a0->vendor_oui[2];
+
+    return true;
+}
+
+/*
+*    Converte o Vendor OUI para um identificador de 24 bits.
+*    @param a0 Ponteiro para a estrutura sfp_a0h_base_t contendo o Vendor OUI já parseado.
+*    @return Valor inteiro de 24 bits representando o Vendor OUI. Caso a estrutura seja inválida, retorna 0.
+*/
+uint32_t sfp_vendor_oui_to_u32(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return 0;
+
+    return ((uint32_t)a0->vendor_oui[0] << 16) |
+           ((uint32_t)a0->vendor_oui[1] << 8)  |
+           ((uint32_t)a0->vendor_oui[2]);
+}
+
+
+
+
+/*
+* Getter Simples
+*/
 sfp_extended_spec_compliance_code_t sfp_a0_get_ext_compliance(const sfp_a0h_base_t *a0)
 {
     if (!a0)
