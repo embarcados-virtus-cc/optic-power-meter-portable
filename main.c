@@ -129,7 +129,7 @@ int main(void)
     /* Tempo para conectar ao um Leitor Serial */
     sleep_ms(2000);
 
-    printf("=== Teste SFP A0h (Bytes 0, 3-10, 11, 16, 17, 18 e 36) ===\n");
+    printf("=== Teste SFP A0h (Byte 0, Byte 1, Byte 17, Byte 18, Byte 3-10 e Byte 36) ===\n");
 
     /* Inicializa I2C */
     sfp_i2c_init(
@@ -164,6 +164,7 @@ int main(void)
 
     /* Parsing do bloco */
     sfp_parse_a0_base_identifier(a0_base_data, &a0);
+    sfp_parse_a0_base_ext_identifier(a0_base_data, &a0); // <-- RF-02
     sfp_parse_a0_base_connector(a0_base_data, &a0);
     sfp_parse_a0_base_om1(a0_base_data, &a0);
     sfp_parse_a0_base_om2(a0_base_data, &a0);
@@ -205,6 +206,26 @@ int main(void)
         Byte 2 - Leitura do Conector
      * =================================== */
     printf("Connector: %s (0x%02X)\n",sfp_connector_to_string(a0.connector),a0_base_data[2]);
+    
+    /* =============================================================
+     * Teste do Byte 1 — Extended Identifier (RF-02)
+     * ============================================================= */
+
+    if (id == SFP_ID_SFP) {
+        uint8_t ext = sfp_a0_get_ext_identifier(&a0);
+
+        printf("\nByte 1 — Extended Identifier: 0x%02X\n", ext);
+
+        if (!sfp_rf02_validate_ext_identifier(&a0)) {
+            printf("RF-02 FALHOU: modulo nao conforme (esperado 0x%02X)\n", SFP_EXT_IDENTIFIER_EXPECTED);
+            printf("Operacao abortada. Sinalize erro ao usuario.\n");
+            while (1) { sleep_ms(250); } // aborta
+        } else {
+            printf("RF-02 OK: modulo conforme (0x%02X)\n", SFP_EXT_IDENTIFIER_EXPECTED);
+        }
+    } else {
+        printf("\nRF-02: pulado (pre-condicao: Byte 0 precisa ser 0x03 / SFP).\n");
+    }
     
     /* =============================================================
      * Teste dos Bytes 3-10 — Códigos de Conformidade do Transceptor

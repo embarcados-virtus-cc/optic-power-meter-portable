@@ -53,6 +53,9 @@
 #define SFP_A2_SIZE       256
 
 
+/* RF-02 — Byte 1 (Extended Identifier) */
+#define SFP_EXT_IDENTIFIER_EXPECTED 0x04
+
 /*==========================================
  * Byte 0 — Identifier (SFF-8472 / SFF-8024)
  ===========================================*/
@@ -437,6 +440,11 @@ bool sfp_read_block(i2c_inst_t *i2c,uint8_t dev_addr,uint8_t start_offset,uint8_
 void sfp_parse_a0_base_identifier(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);
 sfp_identifier_t sfp_a0_get_identifier(const sfp_a0h_base_t *a0);
 
+
+
+void sfp_parse_a0_base_ext_identifier(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+uint8_t sfp_a0_get_ext_identifier(const sfp_a0h_base_t *a0);
+bool sfp_rf02_validate_ext_identifier(const sfp_a0h_base_t *a0);
 /* Byte 2 — Connector */
 void sfp_parse_a0_base_connector(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 sfp_connector_type_t sfp_a0_get_connector(const sfp_a0h_base_t *a0);
