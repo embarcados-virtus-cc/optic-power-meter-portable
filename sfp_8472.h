@@ -507,7 +507,7 @@ uint32_t sfp_vendor_oui_to_u32(const sfp_a0h_base_t *a0);
 
 /* Byte 62 — Fibre Channel Speed 2 */
 void sfp_parse_a0_fc_speed_2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
-bool sfp_get_a0_fc_speed_2(const sfp_a0h_base_t *a0, const sfp_compliance_decoded_t *comp)
+bool sfp_get_a0_fc_speed_2(const sfp_a0h_base_t *a0, const sfp_compliance_decoded_t *comp);
 
 /* Byte 63 CC_BASE (Checksum) */
 void sfp_parse_a0_base_cc_base(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
