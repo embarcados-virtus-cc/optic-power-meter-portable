@@ -350,8 +350,6 @@ int main(void)
         printf("\nByte 10 não indica capacidades estendidas.\n");
     }
     else {
-        printf("Valor Bruto Byte 62: 0x%02X\n", a0.fc_speed2);
-
         if (sfp_get_a0_fc_speed_2(&a0, &comp)) {
             printf("\n64GFC SUPORTADO\n");
         }
