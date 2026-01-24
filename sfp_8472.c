@@ -731,6 +731,92 @@ void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_
 }
 
 /*
+ * Faz o parsing do Byte 62 (Fibre Channel Speed 2)
+ * conforme SFF-8472 Table 5-20
+ *
+ * @details
+ *  O Byte 62 contém códigos de velocidade Fibre Channel adicionais
+ *  que não são contemplados pelo Byte 10 (FC Speed). Este byte fornece
+ *  suporte para velocidades mais altas, como 64GFC e 128GFC.
+ *
+ *  Nota: Conforme SFF-8472 Section 8.3.1, o conteúdo deste byte
+ *  deve ser ignorado a menos que o Byte 10, Bit 1 (see_byte_62) 
+ *  esteja definido como 1.
+ *
+ * @param a0_base_data Ponteiro para o buffer contendo os dados lidos
+ *                     da EEPROM A0h (mínimo de 63 bytes válidos)
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde o
+ *           valor será armazenado
+ *
+ * @return Nenhum
+ */
+void sfp_parse_a0_fc_speed_2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    /* Byte 62 — Fibre Channel Speed 2 */
+    a0->fc_speed2 = a0_base_data[62];
+}
+
+/*
+ * Obtém o valor bruto do Byte 62 (Fibre Channel Speed 2)
+ *
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t contendo
+ *           os dados já parseados do módulo
+ *
+ * @return Valor bruto (0x00-0xFF) do Byte 62. Caso a estrutura
+ *         seja inválida, retorna 0x00.
+ */
+uint8_t sfp_a0_get_fc_speed_2(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return 0x00;
+
+    return a0->fc_speed2;
+}
+
+/*
+ * Verifica o suporte a 64GFC (64 Gigabit Fibre Channel)
+ *
+ * @details
+ *  Conforme SFF-8472 Section 8.3.1, o suporte a velocidades estendidas
+ *  deve ser verificado em dois passos:
+ *
+ *  1. Verificar se o Byte 10, Bit 1 (see_byte_62) está definido como 1.
+ *     Se não estiver, o Byte 62 deve ser ignorado.
+ *
+ *  2. Se see_byte_62 é 1, verificar se o Byte 62 contém o código
+ *     EXT_SPEC_COMPLIANCE_64GFC (0x80) ou se o Byte 10 já indica
+ *     alguma velocidade FC compatível.
+ *
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t contendo
+ *           os dados já parseados (Bytes 10 e 62)
+ * @param comp Ponteiro para a estrutura sfp_compliance_decoded_t
+ *             contendo a decodificação do Byte 10 (compliance codes)
+ *
+ * @return true se 64GFC é suportado, false caso contrário
+ */
+bool sfp_check_64gfc_support(const sfp_a0h_base_t *a0, const sfp_compliance_decoded_t *comp)
+{
+    if (!a0 || !comp)
+        return false;
+
+    /* Step 1: Verificar a pré-condição (Byte 10, Bit 1 — see_byte_62) */
+    if (!comp->see_byte_62) {
+        /* Byte 10 não indica capacidades estendidas */
+        return false;
+    }
+
+    /* Step 2: Se see_byte_62 é 1, verificar o Byte 62 */
+    if (a0->ext_compliance == EXT_SPEC_COMPLIANCE_64GFC) {
+        return true;
+    }
+
+    return false;
+}
+
+/*
 * Realiza a leitura e o parsing do campo Vendor OUI da EEPROM A0h
 * @param a0_base_data Ponteiro para o buffer contendo os dados lidos da EEPROM A0h (mínimo de 40 bytes válidos).
 * @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde o Vendor OUI será armazenado.

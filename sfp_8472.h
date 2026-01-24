@@ -502,6 +502,11 @@ uint16_t sfp_a0_get_om4_copper_or_length_m(const sfp_a0h_base_t *a0, sfp_om4_len
 void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 sfp_extended_spec_compliance_code_t sfp_a0_get_ext_compliance(const sfp_a0h_base_t *a0);
 
+/* Byte 62 — Fibre Channel Speed 2 */
+void sfp_parse_a0_fc_speed_2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+uint8_t sfp_a0_get_fc_speed_2(const sfp_a0h_base_t *a0);
+bool sfp_check_64gfc_support(const sfp_a0h_base_t *a0, const sfp_compliance_decoded_t *comp);
+
 /* Byte 37–39 Vendor OUI (IEEE Company Identifier) */
 void sfp_parse_a0_base_vendor_oui(const uint8_t *a0_base_data,sfp_a0h_base_t *a0);
 bool sfp_a0_get_vendor_oui(const sfp_a0h_base_t *a0, uint8_t oui_buffer[3]);

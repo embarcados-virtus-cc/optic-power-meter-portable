@@ -172,6 +172,7 @@ int main(void)
     sfp_parse_a0_base_om4_or_copper(a0_base_data, &a0);
     sfp_parse_a0_base_ext_compliance(a0_base_data, &a0);
     sfp_parse_a0_base_encoding(a0_base_data, &a0); /* Byte 11 */
+    sfp_parse_a0_fc_speed_2(a0_base_data, &a0);    /* Byte 62 — RF-19 */
     sfp_parse_a0_base_cc_base(a0_base_data, &a0);  /* Byte 63 */
 
     /* =====================================================
@@ -345,28 +346,47 @@ int main(void)
      * Teste da Task #24 (RF-19) - Fibre Channel Speed 2
      * ===================================================== */
     
-    /* 1. Realizar o parsing do Byte 62 */
-    sfp_parse_a0_fc_speed_2(a0_base_data, &a0);
-
-    printf("\n=== Fibre Channel Speed 2 (Byte 62) ===\n");
+    /* 1. Validar dependência com Byte 10 (conforme SFF-8472) */
+    printf("\n=== Fibre Channel Speed 2 (Byte 62) — Task #24 (RF-19) ===\n");
+    printf("Pré-condição: Byte 10, Bit 1 (see_byte_62) deve estar ativo\n");
     
-    /* 2. Validar dependência com Byte 10 (conforme checklist) */
-    /* Note: 'comp' já foi preenchido anteriormente por sfp_decode_compliance */
-    
-    if (comp.see_byte_62) {
-        printf("Status: Byte 10 indica capacidades estendidas.\n");
-        printf("Valor Bruto Byte 62: 0x%02X\n", a0.fc_speed2);
-
-        /* Verificar especificamente 64GFC */
-        if (sfp_check_64gfc_support(&a0, &comp)) {
-             printf("  - Suporte confirmado: 64 Gigabit Fibre Channel (64GFC)\n");
-        } else {
-             printf("  - Byte 62 lido, mas 64GFC não está ativo (Bits reservados ou proprietários).\n");
-        }
-    } else {
-        printf("Status: Byte 10 NÃO indica capacidades estendidas.\n");
-        printf("Ação: O conteúdo do Byte 62 (0x%02X) deve ser ignorado conforme SFF-8472.\n", a0.fc_speed2);
+   
+    if (!comp.see_byte_62) {
+        printf("\n⚠ STATUS: Byte 10 NÃO indica capacidades estendidas.\n");
+        printf("  Ação conforme SFF-8472: O conteúdo do Byte 62 (0x%02X) deve ser IGNORADO.\n", a0_base_data[62]);
+        printf("  Explicação: Pré-condição falhou — vide SFF-8472 Section 8.3.1\n");
     }
+    else {
+        printf("\n✓ STATUS: Pré-condição atendida — Byte 10 Bit 1 = 1 (see_byte_62 ativo)\n");
+        printf("  Valor Bruto Byte 62: 0x%02X\n", a0.fc_speed2);
+        
+        /* 2. Obter valor do Byte 62 */
+        uint8_t fc_speed2_raw = sfp_a0_get_fc_speed_2(&a0);
+        printf("  Valor obtido via getter: 0x%02X\n", fc_speed2_raw);
+        
+        /* 3. Verificar suporte a velocidades estendidas */
+        sfp_extended_spec_compliance_code_t ext_comp_code = sfp_a0_get_ext_compliance(&a0);
+        
+        /* 4. Validar 64GFC especificamente */
+        if (sfp_check_64gfc_support(&a0, &comp)) {
+            printf("\n  ✓ 64GFC SUPORTADO\n");
+            printf("    - Byte 36 contém: EXT_SPEC_COMPLIANCE_64GFC (0x80)\n");
+            printf("    - Módulo compatível com 64 Gigabit Fibre Channel\n");
+        }
+        else {
+            printf("\n  ✗ 64GFC NÃO suportado\n");
+            printf("    - Byte 36: 0x%02X (%s)\n", ext_comp_code, ext_compliance_to_string(ext_comp_code));
+            printf("    - Byte 62 pode conter outras velocidades (ver SFF-8024)\n");
+        }
+        
+        /* 5. Verificar suporte a 128GFC também */
+        if (ext_comp_code == EXT_SPEC_COMPLIANCE_128GFC) {
+            printf("\n  ✓ 128GFC SUPORTADO\n");
+            printf("    - Módulo compatível com 128 Gigabit Fibre Channel\n");
+        }
+    }
+    
+    printf("\nReferência: SFF-8472 Section 8.3.1 (Fibre Channel Speed 2)\n");
 
     /* =====================================================
      * Teste do Byte 63 — CC_BASE (Checksum)
