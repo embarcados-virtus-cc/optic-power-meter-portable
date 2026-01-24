@@ -123,14 +123,14 @@ void sfp_read_compliance(const uint8_t *a0_base_data, sfp_compliance_codes_t *cc
 
 /*
  * Parsing do Byte 14 (SMF Length or Copper Attenuation)
- * 
+ *
  * @details
  *  - Para fibra SMF: Representa o alcance em quilômetros (km)
  *    Unidade: 1 km (valor 0x01 = 1 km, 0x64 = 100 km)
- *  
+ *
  *  - Para cabo de cobre: Representa a atenuação em dB/100m
  *    Unidade: 0.5 dB/100m (valor 0x01 = 0.5 dB/100m)
- *  
+ *
  *  - Valores especiais:
  *    0x00: Não suportado ou informação não disponível
  *    0xFF: Valor superior ao máximo representável (> 254 km ou > 127 dB/100m)
@@ -194,7 +194,7 @@ void sfp_parse_a0_base_smf(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
 
 /*
  * Getter para o alcance SMF ou atenuação de cobre (Byte 14)
- * 
+ *
  * @param a0 Ponteiro para a estrutura sfp_a0h_base_t
  * @param status Ponteiro para armazenar o status (pode ser NULL)
  * @return Alcance em km (SMF) ou atenuação * 2 em dB/100m (cobre)
@@ -731,6 +731,47 @@ void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_
 }
 
 /*
+ * Faz o parsing do Byte 62 (Fibre Channel Speed 2)
+ *
+ * @param a0_base_data Ponteiro para o buffer contendo os dados lidos
+ *                     da EEPROM A0h (mínimo de 63 bytes válidos)
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde o
+ *           valor será armazenado
+ *
+ * @return Nenhum
+ */
+void sfp_parse_a0_fc_speed_2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    /* Byte 62 — Fibre Channel Speed 2 */
+    a0->fc_speed2 = a0_base_data[62];
+}
+
+/*
+ * Verifica o suporte a 64GFC (64 Gigabit Fibre Channel)
+ *
+ * @param a0 Ponteiro para a estrutura sfp_a0h_base_t contendo
+ *           os dados já parseados (Bytes 10 e 62)
+ * @param comp Ponteiro para a estrutura sfp_compliance_decoded_t
+ *             contendo a decodificação do Byte 10 (compliance codes)
+ *
+ * @return true se 64GFC é suportado, false caso contrário
+ */
+bool sfp_get_a0_fc_speed_2(const sfp_a0h_base_t *a0, const sfp_compliance_decoded_t *comp)
+{
+    if (!a0 || !comp)
+        return false;
+
+    if (!comp->see_byte_62) {
+        return false;
+    }
+
+    return a0->fc_speed2;
+}
+
+/*
 * Realiza a leitura e o parsing do campo Vendor OUI da EEPROM A0h
 * @param a0_base_data Ponteiro para o buffer contendo os dados lidos da EEPROM A0h (mínimo de 40 bytes válidos).
 * @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde o Vendor OUI será armazenado.
@@ -745,9 +786,9 @@ void sfp_parse_a0_base_vendor_oui(const uint8_t *a0_base_data,
         return;
 
     /* Bytes 37–39: Vendor OUI (IEEE Company Identifier) */
-    a0->vendor_oui[0] = a0_base_data[37]; 
+    a0->vendor_oui[0] = a0_base_data[37];
     a0->vendor_oui[1] = a0_base_data[38];
-    a0->vendor_oui[2] = a0_base_data[39]; 
+    a0->vendor_oui[2] = a0_base_data[39];
 }
 
 /*
@@ -785,9 +826,7 @@ uint32_t sfp_vendor_oui_to_u32(const sfp_a0h_base_t *a0)
            ((uint32_t)a0->vendor_oui[1] << 8)  |
            ((uint32_t)a0->vendor_oui[2]);
 }
-
-
-
+]
 
 /*
 * Getter Simples
@@ -802,10 +841,10 @@ sfp_extended_spec_compliance_code_t sfp_a0_get_ext_compliance(const sfp_a0h_base
 
 /*
  * Faz a validação do checksum CC_BASE (Byte 63).
- * 
+ *
  * O checksum é calculado como a soma dos bytes 0 a 62 (inclusive) mais o byte 63
  * deve resultar em 0 (ou seja, a soma de todos os bytes 0 a 63 deve ser 0 mod 256).
- * 
+ *
  * @param a0_base_data Ponteiro para o array de dados A0h (64 bytes)
  * @param a0 Ponteiro para a estrutura sfp_a0h_base_t onde o resultado será armazenado
  */
@@ -827,7 +866,7 @@ void sfp_parse_a0_base_cc_base(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
     uint8_t checksum_byte = a0_base_data[63];
 
     /* Verifica se a soma total é  igual ao checksum*/
-   a0->cc_base_is_valid = (sum_mod256 == checksum_byte);
+    a0->cc_base_is_valid = (sum_mod256 == checksum_byte);
 
     /* Armazena o byte do checksum para referência */
     a0->cc_base = checksum_byte;
@@ -835,7 +874,7 @@ void sfp_parse_a0_base_cc_base(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
 
 /*
  * Retorna o status de validação do checksum CC_BASE.
- * 
+ *
  * @param a0 Ponteiro para a estrutura sfp_a0h_base_t
  * @return true se o checksum é válido, false caso contrário
  */
@@ -847,7 +886,7 @@ bool sfp_a0_get_cc_base_is_valid(const sfp_a0h_base_t *a0)
     return a0->cc_base_is_valid;
 }
 
-/*  
+/*
 *   Realiza o parsing do Byte 2 (conector Type)
 *
 *   @param a0_base_data Ponteiro para o buffer contendo os dados lidos
@@ -857,7 +896,7 @@ bool sfp_a0_get_cc_base_is_valid(const sfp_a0h_base_t *a0)
 *
 *   @return Nenhum
 *
-*   
+*
 */
 void sfp_parse_a0_base_connector(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
 {
@@ -872,7 +911,7 @@ void sfp_parse_a0_base_connector(const uint8_t *a0_base_data, sfp_a0h_base_t *a0
 
 /*
 *    Obtém o tipo de conector do módulo SFP/SFP+.
-*    
+*
 *    @param a0 Ponteiro para a estrutura sfp_a0h_base_t contendo os
 *    dados já parseados do módulo.
 *    @return Valor do tipo sfp_connector_type_t que identifica o
