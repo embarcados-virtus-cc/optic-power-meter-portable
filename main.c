@@ -71,14 +71,14 @@ int main(void) {
     sfp_parse_a0_base_encoding(a0_base_data,&system_ctrl.a0);
     
     /*Byte 12*/
-    
+    sfp_parse_a0_base_nominal_rate(a0_base_data, &a0);
     /*Byte 16*/
     sfp_parse_a0_base_om2(a0_base_data,&system_ctrl.a0);
     
     /*Byte 17*/
     
     /*Byte 20-35*/
-    sfp_parse_a0_base_vendor_name(a0_base_data,&system_ctrl.a0);
+    sfp_parse_a0_base_vendor_name(a0_base_data, &a0);
     
     /*Byte 36*/
     sfp_parse_a0_base_ext_compliance(a0_base_data, &system_ctrl.a0);

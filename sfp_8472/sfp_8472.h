@@ -54,8 +54,9 @@
 
 
 
-#define SFP_A0_BYTE_VENDOR_NAME 20
-#define SFP_A0_LEN_VENDOR_NAME  16
+#define SFP_NOMINAL_RATE_RAW_UNSPECIFIED 0x00u
+#define SFP_NOMINAL_RATE_RAW_EXTENDED    0xFFu
+#define SFP_NOMINAL_RATE_RAW_UNIT_MBD   100u
 
 /*==========================================
  * Byte 0 — Identifier (SFF-8472 / SFF-8024)
@@ -83,6 +84,29 @@ typedef enum {
     SFP_ENC_256B_257B = 0x07,
     SFP_ENC_PAM4 = 0x08,
 } sfp_encoding_codes_t;
+
+/* ==============================
+ * Byte 12 — Signaling Rate, Nominal
+ * ============================== */
+typedef enum {
+    SFP_A0_BYTE_NOMINAL_RATE = 12
+} sfp_a0_nominal_rate_offset_t;
+
+typedef enum {
+    SFP_NOMINAL_RATE_NOT_SPECIFIED = 0, /* 00h */
+    SFP_NOMINAL_RATE_VALID,            /* 01h-0xFE (raw * 100 MBd) */
+    SFP_NOMINAL_RATE_EXTENDED          /* 0xFF (rate in extended block, not parsed here) */
+} sfp_nominal_rate_status_t;
+
+
+/* ==============================
+ * Bytes 20-35 — Vendor Name
+ * ============================== */
+typedef enum {
+    SFP_A0_BYTE_VENDOR_NAME = 20,
+    SFP_A0_LEN_VENDOR_NAME  = 16,
+    SFP_A0_END_VENDOR_NAME  = 35
+} sfp_a0_vendor_name_offset_t;
 
 /*
  * Status da informação de alcance OM2
@@ -341,7 +365,8 @@ typedef struct {
     sfp_encoding_codes_t encoding;            // SFF-8024
 
     /* Byte 12: Signaling Rate, Nominal */
-    uint8_t nominal_rate;         // Units of 100 MBd
+    uint8_t nominal_rate;
+    sfp_nominal_rate_status_t nominal_rate_status;         // Units of 100 MBd
 
     /* Byte 13: Rate Identifier */
     uint8_t rate_identifier;      // Table 5-6
@@ -440,6 +465,10 @@ void sfp_parse_a0_base_encoding(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
 sfp_encoding_codes_t sfp_a0_get_encoding(const sfp_a0h_base_t *a0_base_data);
 void sfp_print_encoding(sfp_encoding_codes_t encoding);
 
+/* Byte 12: Signaling Rate, Nominal */
+void sfp_parse_a0_base_nominal_rate(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+uint8_t sfp_a0_get_nominal_rate_mbd(const sfp_a0h_base_t *a0, sfp_nominal_rate_status_t *status);
+
 /* Byte 16 OM2 Length Status (50 um)*/
 void sfp_parse_a0_base_om2(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 uint16_t sfp_a0_get_om2_length_m(const sfp_a0h_base_t *a0, sfp_om2_length_status_t *status);
@@ -452,8 +481,9 @@ uint16_t sfp_a0_get_om1_length_m(const sfp_a0h_base_t *a0,sfp_om1_length_status_
 void sfp_parse_a0_base_om4_or_copper(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
 uint16_t sfp_a0_get_om4_copper_or_length_m(const sfp_a0h_base_t *a0, sfp_om4_length_status_t *status);
 
-
+/* Bytes 20-35 Vendor Name */
 void sfp_parse_a0_base_vendor_name(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
+bool sfp_a0_get_vendor_name(const sfp_a0h_base_t *a0, const char *vendor_name)
 
 /*Byte 36 Extended Compliance Codes) */
 void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);

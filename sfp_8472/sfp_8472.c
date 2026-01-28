@@ -505,7 +505,43 @@ void sfp_print_encoding(sfp_encoding_codes_t encoding)
             break;
     }
 }
+/* ============================================
+ * Byte 12 — Signaling Rate, Nominal
+ * ============================================ */
+void sfp_parse_a0_base_nominal_rate(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
 
+    /* Byte 12 — Signaling Rate, Nominal (somente leitura crua do bloco base) */
+    uint8_t raw = a0_base_data[SFP_A0_BYTE_NOMINAL_RATE];
+    /*a0->nominal_rate = raw;*/
+    if (raw == SFP_NOMINAL_RATE_RAW_UNSPECIFIED) {
+        a0->nominal_rate_status = SFP_NOMINAL_RATE_NOT_SPECIFIED;
+        a0->nominal_rate_mbd    = 0;
+    } else if (raw == SFP_NOMINAL_RATE_RAW_EXTENDED) {
+        a0->nominal_rate_status = SFP_NOMINAL_RATE_EXTENDED;
+        a0->nominal_rate_mbd    = 25400;
+    } else {
+        a0->nominal_rate_status = SFP_NOMINAL_RATE_VALID;
+        a0->nominal_rate_mbd    = (uint32_t)raw * 100;
+    }
+}
+/* ============================================
+ * Método Getter
+ * ============================================ */
+uint8_t sfp_a0_get_nominal_rate_mbd(const sfp_a0h_base_t *a0, sfp_nominal_rate_status_t *status)
+{
+    if (!a0) {
+        if (status)
+            *status = SFP_NOMINAL_RATE_NOT_SPECIFIED;
+        return 0;
+    }
+
+    if (status)
+        *status = a0->nominal_rate_status;
+    return a0->nominal_rate;
+}
 /* =========================================================
  * Byte 14 — Length (SMF) or Attenuation (Copper)
  *
@@ -775,6 +811,75 @@ uint16_t sfp_a0_get_om4_copper_or_length_m(const sfp_a0h_base_t *a0, sfp_om4_len
     return a0->om4_or_copper_length_m;
 }
 
+/* ============================================
+ * Bytes 20-35 — Vendor Name
+ * ============================================ */
+/* ASCII imprimível padrão (inclui espaço) */
+static bool sfp__is_printable_ascii(uint8_t c)
+{
+    return (c >= 0x20u) && (c <= 0x7Eu);
+}
+
+void sfp_parse_a0_base_vendor_name(const uint8_t *a0_base_data, sfp_a0h_base_t *a0)
+{
+    if (!a0_base_data || !a0)
+        return;
+
+    /* Vendor Name (16 bytes) - ASCII, alinhado a esquerda, padding com 0x20 */
+    memcpy(a0->vendor_name, &a0_base_data[SFP_A0_BYTE_VENDOR_NAME], SFP_A0_LEN_VENDOR_NAME);
+    a0->is_valid_vendor_name = sfp_a0_vendor_name_is_valid(a0);
+}
+
+static bool sfp_a0_vendor_name_is_valid(const sfp_a0h_base_t *a0)
+{
+    if (!a0)
+        return false;
+
+    bool found_padding = false;
+    bool has_content = false;
+
+    /* Todos os bytes devem ser ASCII imprimível */
+    for (size_t i = 0; i < SFP_A0_LEN_VENDOR_NAME; i++) {
+        uint8_t c = (uint8_t)a0->vendor_name[i];
+        if (!sfp__is_printable_ascii(c))
+            return false;
+
+        if (c == 0x20u) {
+            found_padding = true;
+            continue;
+        }
+
+        if (found_padding)
+            return false;
+
+        has_content = true;
+    }
+
+    /* Não pode ser vazio (todos espaços) */
+    return has_content;
+}
+/* ============================================
+ * Método Getter
+ * ============================================ */
+bool sfp_a0_get_vendor_name(const sfp_a0h_base_t *a0, const char *vendor_name)
+{
+    if (!a0) {
+        if (vendor_name)
+            *vendor_name = NULL;
+        return false;
+    }
+
+    if (!a0->is_valid_vendor_name) {
+        if (vendor_name)
+            *vendor_name = NULL;
+        return false;
+    }
+
+    if (vendor_name)
+        *vendor_name = a0->vendor_name;
+    
+    return true;
+}
 /* ============================================
  * Byte 36 — Extended Compliance Codes (SFF-8024 Table 4-4)
  * ============================================ */
