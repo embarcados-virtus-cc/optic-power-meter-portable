@@ -365,7 +365,7 @@ typedef struct {
     sfp_encoding_codes_t encoding;            // SFF-8024
 
     /* Byte 12: Signaling Rate, Nominal */
-    uint8_t nominal_rate;
+    uint32_t nominal_rate;
     sfp_nominal_rate_status_t nominal_rate_status;         // Units of 100 MBd
 
     /* Byte 13: Rate Identifier */
