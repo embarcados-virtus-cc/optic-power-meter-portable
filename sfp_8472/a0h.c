@@ -17,6 +17,7 @@
  */
 
 #include "a0h.h"
+#include "defs.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -1228,3 +1229,68 @@ bool sfp_a0_get_cc_base_is_valid(const sfp_a0h_base_t *a0)
         return false;
     return a0->cc_base_is_valid;
 }
+/* ============================================
+ * EXTEND FIELDS A0H
+ * ============================================ */
+
+/* ============================================
+ * Byte 92 — DMI IMPLEMENTED
+ * ============================================ */
+
+void sfp_parse_a0_extended_dmi(const uint8_t *a0_data,sfp_a0h_extended_t *a0) {
+    if (!a0_data || !a0) return;
+
+    // Obtém o byte de Tipo de Monitoramento de Diagnóstico (Byte 92 do A0h)
+    uint8_t diag_type = a0_data[SFP8472_A0_DIAG_MONITORING_TYPE];
+
+    // Conforme a Tabela 8-5, o Bit 6 indica se o monitoramento digital (A2h)
+    // está implementado no transceptor.
+    bool dmi_implemented = (diag_type & (1 << SFP_A0_BIT_DMI_IMPL));
+
+    a0->dmi_implemented = dmi_implemented;
+}
+
+/* ============================================
+ * Função Getter
+ * ============================================ */
+
+bool sfp_a0_get_dmi(const sfp_a0h_extended_t *a0)
+{
+  if(!a0)
+    return false;
+  return a0->dmi_implemented;
+}
+
+/* ============================================
+ * Byte 92 — Change Address required
+ * ============================================ */
+
+void sfp_parse_a0_extended_change_addr_req(const uint8_t *a0_data,sfp_a0h_extended_t *a0){
+  if(!a0_data || !a0) return;
+
+  uint8_t byte92 = a0_data[SFP8472_A0_DIAG_MONITORING_TYPE];
+
+  bool change_addr_req = (byte92 & (1 << SFP_A0_BIT_ADDR_CHANGE_REQ)); 
+
+  a0->change_addr_req = change_addr_req;
+}
+
+/* ============================================
+ * Função Getter
+ * ============================================ */
+
+bool sfp_a0_get_change_addr_req(const sfp_a0h_extended_t *a0){
+  if(!a0) return false;
+
+  return a0->change_addr_req;
+}
+
+
+
+
+/*Byte 92*/
+
+
+
+
+

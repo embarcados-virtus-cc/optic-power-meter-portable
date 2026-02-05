@@ -43,14 +43,14 @@ int main(void) {
     );
     
     /* Buffer cru(raw) da EEPROM A0h */
-    uint8_t a0_base_data[SFP_A0_BASE_SIZE] = {0};
+    uint8_t a0_base_data[SFP_A0_SIZE] = {0};
     
      bool ok = sfp_read_block(
         I2C_PORT,
         SFP_I2C_ADDR_A0,
         0x00,
         a0_base_data,
-        SFP_A0_BASE_SIZE
+        SFP_A0_SIZE
     );
     
      if (!ok) {
