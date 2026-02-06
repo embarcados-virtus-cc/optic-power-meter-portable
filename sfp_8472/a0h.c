@@ -1285,10 +1285,37 @@ bool sfp_a0_get_change_addr_req(const sfp_a0h_extended_t *a0){
   return a0->change_addr_req;
 }
 
+/* ============================================
+ * Byte 92 — Calibration
+ * ============================================ */
+
+void sfp_parse_a0_extended_calibration(const uint8_t *a0_data,sfp_a0h_extended_t *a0){
+
+  if(!a0_data || !a0) return;
+
+  uint8_t byte92 = a0_data[SFP_A0_BIT_INTERNAL_CAL];
+
+  if (byte92 & (1 << SFP_A0_BIT_INTERNAL_CAL)) {
+        a0->calibration = SFP_CAL_INTERNAL;
+    }
+  if (byte92 & (1 << SFP_A0_BIT_EXTERNAL_CAL)) {
+        a0->calibration = SFP_CAL_EXTERNAL;
+    }
+  a0->calibration = SFP_CAL_NOT_SUPPORTED;
+}
+
+/* ============================================
+ * Função Getter
+ * ============================================ */
+
+sfp_cal_type_t sfp_a0_get_calibration(const sfp_a0h_extended_t *a0){
+  if(!a0) return SFP_CAL_NOT_SUPPORTED;
+
+  return a0->calibration;
+}
 
 
 
-/*Byte 92*/
 
 
 
