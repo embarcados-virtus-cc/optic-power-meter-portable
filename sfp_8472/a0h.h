@@ -457,6 +457,17 @@ typedef enum {
 
 } sfp_rate_select;
 
+/*=================================================================
+ * Byte 92: Calibration
+ =================================================================*/
+
+typedef enum {
+    SFP_CAL_NOT_SUPPORTED = 0,
+    SFP_CAL_INTERNAL,
+    SFP_CAL_EXTERNAL
+} sfp_cal_type_t;
+
+
 /**********************************************
  * A0h Memory Map (128 bytes) - Base ID Fields
  **********************************************/
@@ -567,8 +578,8 @@ typedef struct {
     /*uint8_t diagnostic_monitoring_type; */
     bool dmi_implemented;
     bool change_addr_req;
-    bool externally_calibrated;
-    bool internally_calibrated;
+    sfp_cal_type_t calibration;
+    
 
     /* Byte 93: Recursos opcionais aprimorados implementados */
     uint8_t enhanced_options; 
@@ -683,4 +694,7 @@ bool sfp_a0_get_dmi(const sfp_a0h_extended_t *a0);
 void sfp_parse_a0_extended_change_addr_req(const uint8_t *a0_base_data,sfp_a0h_extended_t *a0);
 bool sfp_a0_get_change_addr_req(const sfp_a0h_extended_t *a0);
 
+/*Byte 92 Calibration*/
+void sfp_parse_a0_extended_calibration(const uint8_t *a0_data,sfp_a0h_extended_t *a0);
+sfp_cal_type_t sfp_a0_get_calibration(const sfp_a0h_extended_t *a0);
 #endif /* SFF_8472_A0H_H */
