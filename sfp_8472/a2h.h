@@ -96,7 +96,7 @@ typedef struct {
 
 
 bool check_sfp_a2h_exists(const uint8_t *a2_data);
-bool get_sfp_vcc(const uint8_t *a2_data, double *vcc);
+bool get_sfp_vcc(const uint8_t *a2_data, float *vcc);
 
 
 void sfp_parse_a2h_data_ready(const uint8_t *a2_data,sfp_a2h_t *a2);

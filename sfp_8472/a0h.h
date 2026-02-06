@@ -31,7 +31,6 @@
 
 /** @brief Tamanho do bloco base A0h (Bytes 0-256) */
 #define SFP_A0_SIZE    128
-
 /** @brief Byte 1 (Extended Identifier) */
 #define SFP_EXT_IDENTIFIER_EXPECTED 0x04
 

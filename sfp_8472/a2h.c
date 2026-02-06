@@ -44,7 +44,7 @@ bool sfp_check_data_ready(uint8_t status_byte) {
  * @param vcc Ponteiro para armazenar o valor em Volts.
  * @return true se a leitura for válida, false caso contrário.
  */
-bool get_sfp_vcc(const uint8_t *a2_data, double *vcc) {
+bool get_sfp_vcc(const uint8_t *a2_data, float *vcc) {
     if (!a2_data || !vcc) return false;
 
   
