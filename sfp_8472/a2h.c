@@ -17,6 +17,9 @@ void sfp_parse_a2h_temp_high_alarm(const uint8_t *a2_data,sfp_a2h_t *a2){
   a2->thresholds.temp_high_alarm = TEMP_TO_DEGC(raw_temp);
 
 }
+/* ============================================
+ * Função Getter
+ * ============================================ */
 
 float sfp_a2h_get_temp_high_alarm(const sfp_a2h_t *a2){
   if (!a2) {
@@ -26,6 +29,189 @@ float sfp_a2h_get_temp_high_alarm(const sfp_a2h_t *a2){
   return a2->thresholds.temp_high_alarm;
 }
 
+/* ============================================
+ * Byte 02-03 -Low Temperature Alarm
+ * ============================================ */
+ 
+ void sfp_parse_a2h_temp_low_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TEMP_LOW_ALARM];
+    uint8_t lsb = a2_data[A2_TEMP_LOW_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.temp_low_alarm = TEMP_TO_DEGC(raw);
+}
+
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_temp_low_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.temp_low_alarm;
+}
+
+/* ============================================
+ * Byte 04-05 - High Temperature Warning
+ * ============================================ */
+ void sfp_parse_a2h_temp_high_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TEMP_HIGH_WARNING];
+    uint8_t lsb = a2_data[A2_TEMP_HIGH_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.temp_high_warning = TEMP_TO_DEGC(raw);
+}
+ 
+ /* ============================================
+ * Função Getter
+ * ============================================ */
+ float sfp_a2h_get_temp_high_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.temp_high_warning;
+}
+
+/* ============================================
+ * Byte 06-07 - LowTemperature Warning
+ * ============================================ */
+ void sfp_parse_a2h_temp_low_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TEMP_LOW_WARNING];
+    uint8_t lsb = a2_data[A2_TEMP_LOW_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.temp_low_warning = TEMP_TO_DEGC(raw);
+}
+
+ /* ============================================
+ * Função Getter
+ * ============================================ */
+
+float sfp_a2h_get_temp_low_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.temp_low_warning;
+}
+
+/* ============================================
+ * Byte 08-09 - High Alarm VCC
+ * ============================================ */
+ void sfp_parse_a2h_vcc_high_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_VCC_HIGH_ALARM];
+    uint8_t lsb = a2_data[A2_VCC_HIGH_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.vcc_high_alarm = VCC_TO_VOLTS(raw);
+}
+
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_vcc_high_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.vcc_high_alarm;
+}
+
+/* ============================================
+ * Byte 10-11 - LOW Alarm VCC
+ * ============================================ */
+ void sfp_parse_a2h_vcc_low_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_VCC_LOW_ALARM];
+    uint8_t lsb = a2_data[A2_VCC_LOW_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.vcc_low_alarm = VCC_TO_VOLTS(raw);
+}
+
+/* ============================================
+ * Função Getter
+ * ============================================ */
+
+float sfp_a2h_get_vcc_low_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.vcc_low_alarm;
+}
+
+/* ============================================
+ * Byte 12-13 - High Warning VCC
+ * ============================================ */
+
+void sfp_parse_a2h_vcc_high_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_VCC_HIGH_WARNING];
+    uint8_t lsb = a2_data[A2_VCC_HIGH_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.vcc_high_warning = VCC_TO_VOLTS(raw);
+}
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_vcc_high_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.vcc_high_warning;
+}
+ 
+/* ============================================
+ * Byte 14-15 - Low Warning VCC
+ * ============================================ */
+void sfp_parse_a2h_vcc_low_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_VCC_LOW_WARNING];
+    uint8_t lsb = a2_data[A2_VCC_LOW_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.vcc_low_warning = VCC_TO_VOLTS(raw);
+}
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_vcc_low_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.vcc_low_warning;
+}
 
 
 /**
@@ -87,6 +273,8 @@ bool get_sfp_vcc(const uint8_t *a2_data, float *vcc) {
 
     return true;
 }
+
+
 
 /* ============================================
  * Byte 110 -Data_Not_Ready

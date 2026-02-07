@@ -62,12 +62,43 @@ typedef enum {
 
 /*
  * @brief Offsets de Memória para o Endereço A2h (Diagnósticos)
- * Conforme Tabela 4-3 e Tabela 9-16
+  * Conforme Tabela 4-3 e Tabela 9-16
  */
 typedef enum {
     /* Limiares de Alarme e Aviso (0-55) [43-45] */
     A2_TEMP_HIGH_ALARM	    = 0,	   /* Alarme de Temperatura Alta*/
-    A2_OPT_THRESHOLDS_BASE  = 40,  /* Thresholds Laser/TEC  */
+    A2_TEMP_LOW_ALARM       = 2,    /*Alarme de Temperatura Baixa*/
+    A2_TEMP_HIGH_WARNING    = 4,      /*Avisod de Temperatura Alta*/
+    A2_TEMP_LOW_WARNING     = 6,      /*Aviso de Temperatura Baixa*/
+    A2_VCC_HIGH_ALARM       = 8,     /*Alarme de Tensão Alta*/
+    A2_VCC_LOW_ALARM        = 10,
+    A2_VCC_HIGH_WARNING     = 12,
+    A2_VCC_LOW_WARNING      = 14,
+    A2_BIAS_HIGH_ALARM      = 16,    /* Alarme de Corrente de Bias Alta */
+    A2_BIAS_LOW_ALARM       = 18,    /* Alarme de Corrente de Bias Baixa */
+    A2_BIAS_HIGH_WARNING    = 20,    /* Aviso de Corrente de Bias Alta */
+    A2_BIAS_LOW_WARNING     = 22,    /* Aviso de Corrente de Bias Baixa */
+    
+    A2_TX_POWER_HIGH_ALARM  = 24,    /* Alarme de Potência de Transmissão Alta */
+    A2_TX_POWER_LOW_ALARM   = 26,    /* Alarme de Potência de Transmissão Baixa */
+    A2_TX_POWER_HIGH_WARNING = 28,   /* Aviso de Potência de Transmissão Alta */
+    A2_TX_POWER_LOW_WARNING  = 30,   /* Aviso de Potência de Transmissão Baixa */
+    
+    A2_RX_POWER_HIGH_ALARM  = 32,    /* Alarme de Potência de Recepção Alta */
+    A2_RX_POWER_LOW_ALARM   = 34,    /* Alarme de Potência de Recepção Baixa */
+    A2_RX_POWER_HIGH_WARNING = 36,   /* Aviso de Potência de Recepção Alta */
+    A2_RX_POWER_LOW_WARNING  = 38,   /* Aviso de Potência de Recepção Baixa */
+
+    /* Limites opcionais para Laser Temperature e TEC Current */
+    A2_LASER_TEMP_HIGH_ALARM   = 40, /* Alarme de Temperatura do Laser Alta */
+    A2_LASER_TEMP_LOW_ALARM    = 42, /* Alarme de Temperatura do Laser Baixa */
+    A2_LASER_TEMP_HIGH_WARNING = 44, /* Aviso de Temperatura do Laser Alta */
+    A2_LASER_TEMP_LOW_WARNING  = 46, /* Aviso de Temperatura do Laser Baixa */
+
+    A2_TEC_CURR_HIGH_ALARM     = 48, /* Alarme de Corrente TEC Alta */
+    A2_TEC_CURR_LOW_ALARM      = 50, /* Alarme de Corrente TEC Baixa */
+    A2_TEC_CURR_HIGH_WARNING   = 52, /* Aviso de Corrente TEC Alta */
+    A2_TEC_CURR_LOW_WARNING    = 54,  /* Aviso de Corrente TEC Baixa */
 
     /* Constantes de Calibração / Recursos Avançados (56-91) */
     A2_CAL_CONST_OR_ENHANCED = 56, /* Constantes ou Recursos Melhorados */
