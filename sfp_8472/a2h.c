@@ -1,5 +1,32 @@
 #include "a2h.h"
 
+/* ============================================
+ * Byte 00-01 -High Temperature Alarm
+ * ============================================ */
+
+void sfp_parse_a2h_temp_high_alarm(const uint8_t *a2_data,sfp_a2h_t *a2){
+  if(!a2_data || !a2){
+    return;
+  }
+  uint16_t raw_temp;
+
+  uint8_t msb = a2_data[A2_TEMP_HIGH_ALARM]; 
+  uint8_t lsb = a2_data[A2_TEMP_HIGH_ALARM + 1];/*Deslocando um byte para pegar o msb */
+
+  raw_temp = ((msb << 8) | lsb);
+  a2->thresholds.temp_high_alarm = TEMP_TO_DEGC(raw_temp);
+
+}
+
+float sfp_a2h_get_temp_high_alarm(const sfp_a2h_t *a2){
+  if (!a2) {
+    return -1;/*INDICA UM ERRO*/
+  }
+
+  return a2->thresholds.temp_high_alarm;
+}
+
+
 
 /**
  * Verifica se o transceptor implementa a página de diagnósticos A2h.

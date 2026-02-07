@@ -11,8 +11,8 @@
 
 // Estrutura para os Limiares de Alarme e Aviso (Bytes 0-55)
 typedef struct {
-    uint16_t temp_high_alarm;    // Bytes 00-01
-    uint16_t temp_low_alarm;     // Bytes 02-03
+    float temp_high_alarm;    // Bytes 00-01
+    float temp_low_alarm;     // Bytes 02-03
     uint16_t temp_high_warning;  // Bytes 04-05
     uint16_t temp_low_warning;   // Bytes 06-07
     uint16_t voltage_high_alarm; // Bytes 08-09
@@ -103,5 +103,7 @@ void sfp_parse_a2h_data_ready(const uint8_t *a2_data,sfp_a2h_t *a2);
 bool sfp_a2h_get_data_ready(const sfp_a2h_t *a2);
 
 
+void sfp_parse_a2h_temp_high_alarm(const uint8_t *a2_data,sfp_a2h_t *a2);
+float sfp_a2h_get_temp_high_alarm(const sfp_a2h_t *a2);
 
 #endif

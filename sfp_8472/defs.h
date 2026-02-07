@@ -66,7 +66,7 @@ typedef enum {
  */
 typedef enum {
     /* Limiares de Alarme e Aviso (0-55) [43-45] */
-    A2_THRESHOLDS_BASE      = 0,   /* Início dos thresholds  */
+    A2_TEMP_HIGH_ALARM	    = 0,	   /* Alarme de Temperatura Alta*/
     A2_OPT_THRESHOLDS_BASE  = 40,  /* Thresholds Laser/TEC  */
 
     /* Constantes de Calibração / Recursos Avançados (56-91) */
@@ -85,7 +85,7 @@ typedef enum {
     A2_OPT_TEC_CURR          = 108, /* Corrente TEC */
 
     /* Status e Controle [39-42] */
-    STATUS_CONTROL        	     = 110, /* Bits de status e controle soft  */
+    STATUS_CONTROL           = 110, /* Bits de status e controle soft  */
     A2_ALARM_FLAGS           = 112, /* Flags de Alarme */
     A2_TX_INPUT_EQ_CTRL      = 114, /* Controle de Equalização de Entrada */
     A2_RX_OUT_EMPH_CTRL      = 115, /* Controle de Ênfase de Saída  */
