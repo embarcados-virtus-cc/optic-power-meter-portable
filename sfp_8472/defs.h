@@ -74,10 +74,10 @@ typedef enum {
     A2_VCC_LOW_ALARM        = 10,
     A2_VCC_HIGH_WARNING     = 12,
     A2_VCC_LOW_WARNING      = 14,
-    A2_BIAS_HIGH_ALARM      = 16,    /* Alarme de Corrente de Bias Alta */
-    A2_BIAS_LOW_ALARM       = 18,    /* Alarme de Corrente de Bias Baixa */
-    A2_BIAS_HIGH_WARNING    = 20,    /* Aviso de Corrente de Bias Alta */
-    A2_BIAS_LOW_WARNING     = 22,    /* Aviso de Corrente de Bias Baixa */
+    A2_TX_BIAS_HIGH_ALARM      = 16,    /* Alarme de Corrente de Bias Alta */
+    A2_TX_BIAS_LOW_ALARM       = 18,    /* Alarme de Corrente de Bias Baixa */
+    A2_TX_BIAS_HIGH_WARNING    = 20,    /* Aviso de Corrente de Bias Alta */
+    A2_TX_BIAS_LOW_WARNING     = 22,    /* Aviso de Corrente de Bias Baixa */
     
     A2_TX_POWER_HIGH_ALARM  = 24,    /* Alarme de Potência de Transmissão Alta */
     A2_TX_POWER_LOW_ALARM   = 26,    /* Alarme de Potência de Transmissão Baixa */
@@ -198,7 +198,7 @@ typedef enum {
  */
 #define TEMP_TO_DEGC(raw)    (((int16_t)(raw)) / 256.0f)   /* q8.8 para °C */
 #define VCC_TO_VOLTS(raw)    ((raw) * 0.0001)             /* 100uV/LSB para Volts */
-#define BIAS_TO_MA(raw)      ((raw) * 2.0)                /* 2µA/LSB para mA */
+#define TX_BIAS_TO_MA(raw)      ((raw) * 2.0)                /* 2µA/LSB para mA */
 #define POWER_TO_UW(raw)     ((raw) * 0.1)                /* 0.1µW/LSB para µW */
 
 

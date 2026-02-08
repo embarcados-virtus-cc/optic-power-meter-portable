@@ -19,10 +19,10 @@ typedef struct {
     float vcc_low_alarm;  // Bytes 10-11
     float vcc_high_warning;// Bytes 12-13
     float vcc_low_warning; // Bytes 14-15
-    float bias_high_alarm;    // Bytes 16-17
-    float bias_low_alarm;     // Bytes 18-19
-    float bias_high_warning;  // Bytes 20-21
-    float bias_low_warning;   // Bytes 22-23
+    float tx_bias_high_alarm;    // Bytes 16-17
+    float tx_bias_low_alarm;     // Bytes 18-19
+    float tx_bias_high_warning;  // Bytes 20-21
+    float tx_bias_low_warning;   // Bytes 22-23
     float tx_power_high_alarm; // Bytes 24-25
     float tx_power_low_alarm;  // Bytes 26-27
     float tx_power_high_warning;// Bytes 28-29

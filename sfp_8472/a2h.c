@@ -214,6 +214,293 @@ float sfp_a2h_get_vcc_low_warning(const sfp_a2h_t *a2){
 }
 
 
+/* ============================================
+ * Byte 16-17 - High Alarm BIAS
+ * ============================================ */
+ 
+ void sfp_parse_a2h_tx_bias_high_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_BIAS_HIGH_ALARM];
+    uint8_t lsb = a2_data[A2_TX_BIAS_HIGH_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_bias_high_alarm = TX_BIAS_TO_MA(raw);
+}
+
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_tx_bias_high_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_bias_high_alarm;
+}
+
+/* ============================================
+ * Byte 18-19 - Low Alarm BIAS
+ * ============================================ */
+ void sfp_parse_a2h_tx_bias_low_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_BIAS_LOW_ALARM];
+    uint8_t lsb = a2_data[A2_TX_BIAS_LOW_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_bias_low_alarm = TX_BIAS_TO_MA(raw);
+}
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_tx_bias_low_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_bias_low_alarm;
+}
+
+/* ============================================
+ * Byte 20-21 - High Warning BIAS
+ * ============================================ */
+void sfp_parse_a2h_tx_bias_high_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_BIAS_HIGH_WARNING];
+    uint8_t lsb = a2_data[A2_TX_BIAS_HIGH_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_bias_high_warning = TX_BIAS_TO_MA(raw);
+}
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_tx_bias_high_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_bias_high_warning;
+}
+
+
+/* ============================================
+ * Byte 22-23 - Low Warning BIAS
+ * ============================================ */
+void sfp_parse_a2h_tx_bias_low_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_BIAS_LOW_WARNING];
+    uint8_t lsb = a2_data[A2_TX_BIAS_LOW_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_bias_low_warning = TX_BIAS_TO_MA(raw);
+}
+
+float sfp_a2h_get_tx_bias_low_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_bias_low_warning;
+}
+
+
+/* ============================================
+ * Byte 24-25 - High Alarm TX
+ * ============================================ */
+void sfp_parse_a2h_tx_power_high_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_POWER_HIGH_ALARM];
+    uint8_t lsb = a2_data[A2_TX_POWER_HIGH_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_power_high_alarm = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_tx_power_high_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_power_high_alarm;
+}
+
+
+
+/* ============================================
+ * Byte 26-27 - Low Alarm TX
+ * ============================================ */
+void sfp_parse_a2h_tx_power_low_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_POWER_LOW_ALARM];
+    uint8_t lsb = a2_data[A2_TX_POWER_LOW_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_power_low_alarm = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_tx_power_low_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_power_low_alarm;
+}
+
+
+
+
+
+/* ============================================
+ * Byte 28-29 - High Warning TX
+ * ============================================ */
+void sfp_parse_a2h_tx_power_high_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_POWER_HIGH_WARNING];
+    uint8_t lsb = a2_data[A2_TX_POWER_HIGH_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_power_high_warning = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_tx_power_high_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_power_high_warning;
+}
+
+
+/* ============================================
+ * Byte 30-21 - Low Warning TX
+ * ============================================ */
+void sfp_parse_a2h_tx_power_low_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_TX_POWER_LOW_WARNING];
+    uint8_t lsb = a2_data[A2_TX_POWER_LOW_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.tx_power_low_warning = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_tx_power_low_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.tx_power_low_warning;
+}
+
+
+
+void sfp_parse_a2h_rx_power_high_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_RX_POWER_HIGH_ALARM];
+    uint8_t lsb = a2_data[A2_RX_POWER_HIGH_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.rx_power_high_alarm = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_rx_power_high_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.rx_power_high_alarm;
+}
+
+
+void sfp_parse_a2h_rx_power_low_alarm(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_RX_POWER_LOW_ALARM];
+    uint8_t lsb = a2_data[A2_RX_POWER_LOW_ALARM + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.rx_power_low_alarm = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_rx_power_low_alarm(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.rx_power_low_alarm;
+}
+
+
+void sfp_parse_a2h_rx_power_high_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_RX_POWER_HIGH_WARNING];
+    uint8_t lsb = a2_data[A2_RX_POWER_HIGH_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.rx_power_high_warning = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_rx_power_high_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.rx_power_high_warning;
+}
+
+
+void sfp_parse_a2h_rx_power_low_warning(const uint8_t *a2_data, sfp_a2h_t *a2){
+    if(!a2_data || !a2){
+        return;
+    }
+
+    uint16_t raw;
+    uint8_t msb = a2_data[A2_RX_POWER_LOW_WARNING];
+    uint8_t lsb = a2_data[A2_RX_POWER_LOW_WARNING + 1];
+
+    raw = (msb << 8) | lsb;
+    a2->thresholds.rx_power_low_warning = POWER_TO_UW(raw);
+}
+
+float sfp_a2h_get_rx_power_low_warning(const sfp_a2h_t *a2){
+    if(!a2){
+        return -1;
+    }
+    return a2->thresholds.rx_power_low_warning;
+}
+
+
 /**
  * Verifica se o transceptor implementa a página de diagnósticos A2h.
  * @param a0_data Buffer contendo os 256 bytes lidos do endereço A0h.
