@@ -61,10 +61,10 @@ typedef struct {
     uint8_t cc_dmi;                 // Byte 95: Checksum dos diagnósticos
 
     // 96-109: Dados de Diagnóstico em Tempo Real [10, 12]
-    double temp_realtime;         // Bytes 96-97
-    double vcc_realtime;          // Bytes 98-99
-    double tx_bias_realtime;      // Bytes 100-101
-    double tx_power_realtime;     // Bytes 102-103
+    double temp;                  // Bytes 96-97
+    double vcc;          // Bytes 98-99
+    double tx_bias;             // Bytes 100-101
+    double tx_power;             // Bytes 102-103
     double rx_power;              // Bytes 104-105
     double laser_temp_wave_opt;   // Bytes 106-107 (Opcional)
     double tec_current_opt;       // Bytes 108-109 (Opcional)
@@ -185,7 +185,31 @@ float sfp_a2h_get_rx_power_high_warning(const sfp_a2h_t *a2);
 void sfp_parse_a2h_rx_power_low_warning(const uint8_t *a2_data, sfp_a2h_t *a2);
 float sfp_a2h_get_rx_power_low_warning(const sfp_a2h_t *a2);
 
+/* ============================================
+ * TEMPERATURE (96-97)
+ * ============================================ */
+void sfp_parse_a2h_temperature(const uint8_t *a2_data,sfp_a2h_t *a2);
+float sfp_a2h_get_temperature(const sfp_a2h_t *a2);
 
+/* ============================================
+ * VCC (98-99)
+ * ============================================ */
+void sfp_parse_a2h_vcc(const uint8_t *a2_data,sfp_a2h_t *a2);
+float sfp_a2h_get_vcc(const sfp_a2h_t *a2);
+
+
+/* ============================================
+ * TX BIAS CURRENT
+ * ============================================ */
+void sfp_parse_a2h_tx_bias(const uint8_t *a2_data,sfp_a2h_t *a2);
+float sfp_a2h_get_tx_bias(const sfp_a2h_t *a2);
+
+/* ============================================
+ * TX POWER
+ * ============================================ */
+void sfp_parse_a2h_tx_power(const uint8_t *a2_data,sfp_a2h_t *a2);
+float sfp_a2h_get_tx_power(const sfp_a2h_t *a2);
+float sfp_a2h_get_tx_power_dbm(const sfp_a2h_t *a2);
 /* ============================================
  * RX POWER 
  * ============================================ */

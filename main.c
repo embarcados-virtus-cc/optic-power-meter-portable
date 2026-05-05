@@ -12,13 +12,14 @@
 #include "I2C/i2c.h"
 #include "sfp_8472/a0h.h"
 #include "sfp_8472/a2h.h"
+#include "sfp_8472/sfp.h"
 #include "menu/menu.h"
 
 
 /* Barramento físico */
-#define I2C_PORT i2c0
-#define I2C_SDA  0
-#define I2C_SCL  1
+#define I2C_PORT i2c1
+#define I2C_SDA  11
+#define I2C_SCL  10
 
 /**
  * @brief Ponto de entrada principal do programa
@@ -29,12 +30,14 @@
  * @return int Código de retorno do programa (0 para sucesso)
  */
 int main(void) {
+
     // Inicialização do sistema
     stdio_init_all();
     ssd1306_Init();
     joystickPi_init();
 
     sleep_ms(2000);/*Delay para inicializar os dados corretamente*/
+    /*sfp_t sfp;*/
     
     
     /* Inicializa I2C */
@@ -44,85 +47,9 @@ int main(void) {
         I2C_SCL,
         100 * 1000
     );
-    
-    /* Buffer cru(raw) da EEPROM A0h */
-    uint8_t a0_base_data[SFP_A0_SIZE] = {0};
-    
-     bool ok = sfp_read_block(
-        I2C_PORT,
-        SFP_I2C_ADDR_A0,
-        0x00,
-        a0_base_data,
-        SFP_A0_SIZE
-    );
-    
-     if (!ok) {
-        //printf("ERRO: Falha na leitura do A0h\n");
-        while (1);
-    }
-    /*Buffer cru(raw) da EEPROM A2H*/
-     uint8_t a2_data[SFP_A2_SIZE];
 
-     ok = sfp_read_block(
-        I2C_PORT,
-        SFP_I2C_ADDR_A2,
-        0x00,
-        a2_data,
-        SFP_A2_SIZE
-    );
-     if(!ok){
-       while(1);
-     }
-
-     sfp_a2h_t a2;
-     sfp_parse_a2h_rx_power(a2_data,&a2);
-     float rx_wm = sfp_a2h_get_rx_power(&a2); 
-     float rx_dbm = sfp_a2h_get_rx_power_dbm(&a2);
-
-     printf("O VALOR RX: %.2f\n",rx_wm);
-     printf("o VALOR RX_DBM: %.2f\n",rx_dbm);
-
- 
- 
-
-    
     // Inicialização de dados do SFP
     init_sfp_data();
-    
-    /*Colocar Init()*/
-    sfp_parse_a0_base_identifier(a0_base_data, &system_ctrl.a0);
-    
-    /*Byte 3 - 10*/
-    //sfp_read_compliance(a0_base_data,&system_ctrl.a0.cc);
-    //sfp_decode_compliance(&system_ctrl.a0.cc,&system_ctrl.a0.dc);
-    sfp_parse_a0_base_compliance(a0_base_data,&system_ctrl.a0.cc);
-    sfp_a0_decode_compliance(&system_ctrl.a0.cc,&system_ctrl.a0.dc);
-    
-    /*Byte 11*/
-    sfp_parse_a0_base_encoding(a0_base_data,&system_ctrl.a0);
-    
-    /*Byte 12*/
-    sfp_parse_a0_base_nominal_rate(a0_base_data,&system_ctrl.a0);
-    /*Byte 16*/
-    sfp_parse_a0_base_om2(a0_base_data,&system_ctrl.a0);
-    
-    /*Byte 17*/
-    
-    /*Byte 20-35*/
-    sfp_parse_a0_base_vendor_name(a0_base_data,&system_ctrl.a0);
-    
-    /*Byte 36*/
-    sfp_parse_a0_base_ext_compliance(a0_base_data, &system_ctrl.a0);
-    
-    
-
-    
-    // Configuração inicial dos timers
-    uint32_t current_time = to_ms_since_boot(get_absolute_time());
-    
-    // Inicializa a estrutura de controle do sistema
-    // Nota: A estrutura system_ctrl é estática em menu.c, então
-    // precisamos inicializar através das funções do menu
     
     // Mensagem de boas-vindas
     ssd1306_Fill(Black);
@@ -132,7 +59,8 @@ int main(void) {
     ssd1306_WriteString("v1.2", Font_6x8, White);
     ssd1306_UpdateScreen();
     sleep_ms(2000);
-    
+
+    //init_sfp_data();
     // Loop principal
     while (true) {
         // Processa entrada do joystick

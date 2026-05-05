@@ -9,30 +9,9 @@ SystemControl system_ctrl = {
     .last_joystick_move = 0,
     .last_button_press = 0,
     .last_data_update = 0,
-    .sfp_data = {0},
-    .a0 = {0},
+    .sfp = {0},
     .joystick_enabled = true,
     .scroll_position = 0
-};
-
-// ==================== DADOS ESTÁTICOS ====================
-static const char* FABRICANTES[] = {
-    "CISCO", "JUNIPER", "HUAWEI", "FINISAR", "AVAGO",
-    "INTEL", "BROADCOM", "DELL", "HP", "ARISTA"
-};
-
-static const char* TIPOS_MODULO[] = {
-    "SFP-10G-SR", "SFP-10G-LR", "FP-10G-ER", "SFP-10G-ZR",
-    "SFP-28G-SR", "SFP-28G-LR", "SFP+ 10G", "QSFP-40G-SR4",
-    "QSFP-100G-SR4", "QSFP-DD-400G"
-};
-
-static const uint16_t COMPRIMENTOS_ONDA[] = {850, 1310, 1490, 1550, 1310, 1550};
-static const uint16_t DISTANCIAS_MAX[] = {300, 10000, 40000, 100, 2000, 8000};
-static const char SERIAL_NUMBERS[][12] = {
-    "FNS12345678", "JNP87654321", "HWE11223344", "FIN55667788",
-    "AVG99887766", "INT33445566", "BRD22334455", "DEL77889900",
-    "HP00112233", "ARS44556677"
 };
 
 // ==================== FUNÇÕES AUXILIARES ====================
@@ -41,87 +20,17 @@ static const char SERIAL_NUMBERS[][12] = {
  * @brief Inicializa dados do módulo SFP com valores aleatórios realistas
  */
 void init_sfp_data(void) {
-    uint32_t seed = to_ms_since_boot(get_absolute_time());
-    srand(seed);
-    
-    int idx;
-    
-    // Fabricante
-    idx = rand() % (sizeof(FABRICANTES) / sizeof(FABRICANTES[0]));
-    strncpy(system_ctrl.sfp_data.fabricante, FABRICANTES[idx], 
-            sizeof(system_ctrl.sfp_data.fabricante) - 1);
-    
-    // Tipo de módulo
-    idx = rand() % (sizeof(TIPOS_MODULO) / sizeof(TIPOS_MODULO[0]));
-    strncpy(system_ctrl.sfp_data.tipo, TIPOS_MODULO[idx],
-            sizeof(system_ctrl.sfp_data.tipo) - 1);
-    
-    // Número de série
-    idx = rand() % (sizeof(SERIAL_NUMBERS) / sizeof(SERIAL_NUMBERS[0]));
-    strncpy(system_ctrl.sfp_data.serial, SERIAL_NUMBERS[idx],
-            sizeof(system_ctrl.sfp_data.serial) - 1);
-    
-    // Comprimento de onda
-    idx = rand() % (sizeof(COMPRIMENTOS_ONDA) / sizeof(COMPRIMENTOS_ONDA[0]));
-    system_ctrl.sfp_data.comprimento_onda = COMPRIMENTOS_ONDA[idx];
-    
-    // Distância máxima
-    idx = rand() % (sizeof(DISTANCIAS_MAX) / sizeof(DISTANCIAS_MAX[0]));
-    system_ctrl.sfp_data.distancia_max = DISTANCIAS_MAX[idx];
-    
-    // Valores iniciais de operação
-    system_ctrl.sfp_data.temperatura = 35.0f + (rand() % 100) / 10.0f;
-    system_ctrl.sfp_data.tensao = 3.2f + (rand() % 150) / 100.0f;
-    system_ctrl.sfp_data.potencia_tx = -2.0f - (rand() % 30) / 10.0f;
-    system_ctrl.sfp_data.potencia_rx = -3.0f - (rand() % 40) / 10.0f;
-    system_ctrl.sfp_data.corrente_bias = 30.0f + (rand() % 400) / 10.0f;
-    system_ctrl.sfp_data.alarmes_ativos = rand() % 4;
-    
-    // Determina taxa de dados baseada no tipo
-    if (strstr(system_ctrl.sfp_data.tipo, "10G") != NULL) {
-        system_ctrl.sfp_data.taxa_dados = 10;
-    } else if (strstr(system_ctrl.sfp_data.tipo, "28G") != NULL) {
-        system_ctrl.sfp_data.taxa_dados = 28;
-    } else if (strstr(system_ctrl.sfp_data.tipo, "40G") != NULL) {
-        system_ctrl.sfp_data.taxa_dados = 40;
-    } else if (strstr(system_ctrl.sfp_data.tipo, "100G") != NULL) {
-        system_ctrl.sfp_data.taxa_dados = 100;
-    } else if (strstr(system_ctrl.sfp_data.tipo, "400G") != NULL) {
-        system_ctrl.sfp_data.taxa_dados = 400;
-    } else {
-        system_ctrl.sfp_data.taxa_dados = 1;
-    }
+
+    bool ok = sfp_init(&system_ctrl.sfp);
 }
 
 /**
  * @brief Atualiza dados do SFP com variações realistas
  */
 void update_sfp_data(void) {
-    // Variação de temperatura (-0.2°C a +0.2°C)
-    system_ctrl.sfp_data.temperatura += ((rand() % 5) - 2) * 0.1f;
-    
-    // Limites de temperatura operacional
-    if (system_ctrl.sfp_data.temperatura < 20.0f) {
-        system_ctrl.sfp_data.temperatura = 20.0f;
-    }
-    if (system_ctrl.sfp_data.temperatura > 70.0f) {
-        system_ctrl.sfp_data.temperatura = 70.0f;
-    }
-    
-    // Variação de tensão
-    system_ctrl.sfp_data.tensao += ((rand() % 3) - 1) * 0.01f;
-    if (system_ctrl.sfp_data.tensao < 3.0f) system_ctrl.sfp_data.tensao = 3.0f;
-    if (system_ctrl.sfp_data.tensao > 3.6f) system_ctrl.sfp_data.tensao = 3.6f;
-    
-    // Variações de potência e corrente
-    system_ctrl.sfp_data.potencia_tx += ((rand() % 5) - 2) * 0.1f;
-    system_ctrl.sfp_data.potencia_rx += ((rand() % 5) - 2) * 0.1f;
-    system_ctrl.sfp_data.corrente_bias += ((rand() % 5) - 2) * 0.1f;
-    
-    // Geração ocasional de alarmes
-    if (rand() % 50 == 0) {
-        system_ctrl.sfp_data.alarmes_ativos = (system_ctrl.sfp_data.alarmes_ativos + 1) % 5;
-    }
+
+    bool ok = sfp_update(&system_ctrl.sfp);
+
 }
 
 // ==================== FUNÇÕES DE DESENHO ====================
@@ -271,17 +180,19 @@ void draw_main_menu(void) {
     // Preenche valores dinâmicos
     char temp_buffer[15];
     
-    // Número de alarmes ativos
-    snprintf(temp_buffer, sizeof(temp_buffer), "%d", system_ctrl.sfp_data.alarmes_ativos);
-    strncpy(menu_items[0].value, temp_buffer, sizeof(menu_items[0].value) - 1);
+    // Número de alarmes ativos - Desatualizado
+    // snprintf(temp_buffer, sizeof(temp_buffer), "%d", system_ctrl.sfp_data.alarmes_ativos); 
+    // strncpy(menu_items[0].value, temp_buffer, sizeof(menu_items[0].value) - 1);
     
     // Temperatura atual
-    snprintf(temp_buffer, sizeof(temp_buffer), "%.1fC", system_ctrl.sfp_data.temperatura);
+    snprintf(temp_buffer, sizeof(temp_buffer), "%.1fC", sfp_a2h_get_temperature(&system_ctrl.sfp.a2));
     strncpy(menu_items[1].value, temp_buffer, sizeof(menu_items[1].value) - 1);
     
-    // Taxa de dados
-    snprintf(temp_buffer, sizeof(temp_buffer), "%dG", system_ctrl.sfp_data.taxa_dados);
-    strncpy(menu_items[2].value, temp_buffer, sizeof(menu_items[2].value) - 1);
+    // Taxa de dados - Desatualizado
+    // snprintf(temp_buffer, sizeof(temp_buffer), "%dG", system_ctrl.sfp_data.taxa_dados);
+    // strncpy(menu_items[2].value, temp_buffer, sizeof(menu_items[2].value) - 1);
+
+
     
     // Ajusta offset de rolagem
     adjust_scroll_offset();
@@ -401,16 +312,16 @@ void draw_status_screen(void) {
     // Array de dados de status
     char status_items[10][30];
     
-    snprintf(status_items[0], sizeof(status_items[0]), "Temp:    %.1f C", system_ctrl.sfp_data.temperatura);
-    snprintf(status_items[1], sizeof(status_items[1]), "Tensao:  %.2f V", system_ctrl.sfp_data.tensao);
-    snprintf(status_items[2], sizeof(status_items[2]), "Pot TX:  %.1f dBm", system_ctrl.sfp_data.potencia_tx);
-    snprintf(status_items[3], sizeof(status_items[3]), "Pot RX:  %.1f dBm", system_ctrl.sfp_data.potencia_rx);
-    snprintf(status_items[4], sizeof(status_items[4]), "Bias:    %.1f mA", system_ctrl.sfp_data.corrente_bias);
-    snprintf(status_items[5], sizeof(status_items[5]), "Taxa:    %d Gbps", system_ctrl.sfp_data.taxa_dados);
-    snprintf(status_items[6], sizeof(status_items[6]), "Alarmes: %d", system_ctrl.sfp_data.alarmes_ativos);
-    snprintf(status_items[7], sizeof(status_items[7]), "Serial:  %s", system_ctrl.sfp_data.serial);
-    snprintf(status_items[8], sizeof(status_items[8]), "Fabric:  %s", system_ctrl.sfp_data.fabricante);
-    snprintf(status_items[9], sizeof(status_items[9]), "Tipo:    %s", system_ctrl.sfp_data.tipo);
+    snprintf(status_items[0], sizeof(status_items[0]), "Temp:    %.1f C", sfp_a2h_get_temperature(&system_ctrl.sfp.a2));
+    snprintf(status_items[1], sizeof(status_items[1]), "Tensao:  %.2f V", sfp_a2h_get_vcc(&system_ctrl.sfp.a2));
+    snprintf(status_items[2], sizeof(status_items[2]), "Pot TX:  %.1f dBm", sfp_a2h_get_tx_power_dbm(&system_ctrl.sfp.a2));
+    snprintf(status_items[3], sizeof(status_items[3]), "Pot RX:  %.1f dBm", sfp_a2h_get_rx_power_dbm(&system_ctrl.sfp.a2));
+    snprintf(status_items[4], sizeof(status_items[4]), "Bias:    %.1f mA", sfp_a2h_get_tx_bias(&system_ctrl.sfp.a2));
+    // snprintf(status_items[5], sizeof(status_items[5]), "Taxa:    %d Gbps", system_ctrl.sfp_data.taxa_dados);
+    // snprintf(status_items[6], sizeof(status_items[6]), "Alarmes: %d", system_ctrl.sfp_data.alarmes_ativos);
+    snprintf(status_items[7], sizeof(status_items[7]), "Part Num: %s", sfp_a0_get_vendor_pn(&system_ctrl.sfp.a0));
+    snprintf(status_items[8], sizeof(status_items[8]), "Fabric: %s", sfp_a0_get_vendor_name(&system_ctrl.sfp.a0));
+    // snprintf(status_items[9], sizeof(status_items[9]), "Tipo:    %s", system_ctrl.sfp_data.tipo);
     
     // Mostra indicadores de rolagem se necessário
     if (system_ctrl.scroll_position > 0) {
@@ -451,63 +362,35 @@ void draw_dados_info_screen(void) {
     draw_footer("UP/DOWN:Rolar  ENTER:Menu");
     
     // Array de todas as informações
-    char info_items[15][35];
+    static char info_items[16][35];
     
     // Seção 1: Dados básicos do módulo
     snprintf(info_items[0], sizeof(info_items[0]), "Vendor: %s", 
-             system_ctrl.a0.vendor_name);
-    snprintf(info_items[1], sizeof(info_items[1]), "MODELO: %s", 
-             system_ctrl.sfp_data.tipo);
-    snprintf(info_items[2], sizeof(info_items[2]), "SERIAL: %s", 
-             system_ctrl.sfp_data.serial);
+             system_ctrl.sfp.a0.vendor_name);
+    // snprintf(info_items[1], sizeof(info_items[1]), "MODELO: %s", system_ctrl.sfp_data.tipo);
+    snprintf(info_items[1], sizeof(info_items[1]), "Vendor Rev: %s", sfp_a0_get_vendor_rev(&system_ctrl.sfp.a0));
+    snprintf(info_items[2], sizeof(info_items[2]), "Part Num: %s", sfp_a0_get_vendor_pn(&system_ctrl.sfp.a0));
+
     //snprintf(info_items[3], sizeof(info_items[3]), "TAXA DADOS: %d Gbps", system_ctrl.sfp_data.taxa_dados);
     
-    snprintf(info_items[3], sizeof(info_items[3]), "Ext.Spec: %s", ext_compliance_to_string(system_ctrl.a0.ext_compliance)); /*Byte 36*/
-    snprintf(info_items[4], sizeof(info_items[4]), "Ident: %s",sfp_identifier_to_string(system_ctrl.a0.identifier)); /*Byte 0*/
-    snprintf(info_items[5], sizeof(info_items[5]), "Eth/InfB:%s",sfp_compliance_byte3_to_string(&system_ctrl.a0.dc)); /*Byte 3*/
-    snprintf(info_items[6], sizeof(info_items[6]), "Escon/Sonet:%s",sfp_compliance_byte4_to_string(&system_ctrl.a0.dc)); /*Byte 4*/
-    snprintf(info_items[7], sizeof(info_items[7]), "Sonet:%s",sfp_compliance_byte5_to_string(&system_ctrl.a0.dc)); /*Byte 5*/
-    snprintf(info_items[8], sizeof(info_items[8]), "Eth:%s",sfp_compliance_byte6_to_string(&system_ctrl.a0.dc)); /*Byte 6*/
-    snprintf(info_items[9], sizeof(info_items[9]), "FbrCh_T:%s",sfp_compliance_byte7_to_string(&system_ctrl.a0.dc)); /*Byte 7*/
-    snprintf(info_items[10], sizeof(info_items[10]),"FbrCh_CT:%s",sfp_compliance_byte8_to_string(&system_ctrl.a0.dc)); /*Byte 8*/
-    snprintf(info_items[11], sizeof(info_items[11]), "Fbr_TM:%s",sfp_compliance_byte9_to_string(&system_ctrl.a0.dc)); /*Byte 9*/
-    snprintf(info_items[12], sizeof(info_items[12]), "Fbr_S:%s",sfp_compliance_byte10_to_string(&system_ctrl.a0.dc)); /*Byte 10*/
-    snprintf(info_items[13], sizeof(info_items[13]), "Enc:%s",sfp_encoding_to_string(system_ctrl.a0.encoding)); /*Byte 11*/
-    snprintf(info_items[14], sizeof(info_items[14]), "OM2:%s",sfp_om2_to_string(system_ctrl.a0.om2_status,system_ctrl.a0.om2_length_m)); /*Byte 16*/
+    snprintf(info_items[3], sizeof(info_items[3]), "Ext.Spec: %s", ext_compliance_to_string(system_ctrl.sfp.a0.ext_compliance)); /*Byte 36*/
+    snprintf(info_items[4], sizeof(info_items[4]), "Ident: %s",sfp_identifier_to_string(system_ctrl.sfp.a0.identifier)); /*Byte 0*/
+    snprintf(info_items[5], sizeof(info_items[5]), "Eth/InfB:%s",sfp_compliance_byte3_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 3*/
+    snprintf(info_items[6], sizeof(info_items[6]), "Escon/Sonet:%s",sfp_compliance_byte4_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 4*/
+    snprintf(info_items[7], sizeof(info_items[7]), "Sonet:%s",sfp_compliance_byte5_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 5*/
+    snprintf(info_items[8], sizeof(info_items[8]), "Eth:%s",sfp_compliance_byte6_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 6*/
+    snprintf(info_items[9], sizeof(info_items[9]), "FbrCh_T:%s",sfp_compliance_byte7_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 7*/
+    snprintf(info_items[10], sizeof(info_items[10]),"FbrCh_CT:%s",sfp_compliance_byte8_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 8*/
+    snprintf(info_items[11], sizeof(info_items[11]), "Fbr_TM:%s",sfp_compliance_byte9_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 9*/
+    snprintf(info_items[12], sizeof(info_items[12]), "Fbr_S:%s",sfp_compliance_byte10_to_string(&system_ctrl.sfp.a0.dc)); /*Byte 10*/
+    snprintf(info_items[13], sizeof(info_items[13]), "Enc:%s",sfp_encoding_to_string(system_ctrl.sfp.a0.encoding)); /*Byte 11*/
+    snprintf(info_items[14], sizeof(info_items[14]), "OM2:%s",sfp_om2_to_string(system_ctrl.sfp.a0.om2_status,system_ctrl.sfp.a0.om2_length_m));
+    snprintf(info_items[15], sizeof(info_items[15]), "Wave: %lu", system_ctrl.sfp.a0.wavelength_nm);
+     /*Byte 16*/
+
+    // snprintf(info_items[15], sizeof(info_items[15]), "Wave: %lu", system_ctrl.sfp.a0.wavelength_nm);
     
-    
-    
-    
-    
-    
-    
-    
-    // Seção 2: Especificações técnicas
-    //snprintf(info_items[4], sizeof(info_items[4]), "COMPR. ONDA: %d nm", system_ctrl.sfp_data.comprimento_onda);
-    //snprintf(info_items[5], sizeof(info_items[5]), "DIST. MAX: %d m",        system_ctrl.sfp_data.distancia_max);
-    
-    /*const char* fibra_tipo = (system_ctrl.sfp_data.comprimento_onda == 850) ? 
-                             "MMF (OM3/OM4)" : "SMF";
-    snprintf(info_items[6], sizeof(info_items[6]), "TIPO FIBRA: %s", fibra_tipo);*/
-    
-    // Seção 3: Parâmetros operacionais atuais
-   /* snprintf(info_items[7], sizeof(info_items[7]), "TEMP ATUAL: %.1f C", 
-             system_ctrl.sfp_data.temperatura);
-    snprintf(info_items[8], sizeof(info_items[8]), "TENSAO ATUAL: %.2f V", 
-             system_ctrl.sfp_data.tensao);
-    snprintf(info_items[9], sizeof(info_items[9]), "POT TX: %.1f dBm", 
-             system_ctrl.sfp_data.potencia_tx);
-    snprintf(info_items[10], sizeof(info_items[10]), "POT RX: %.1f dBm", 
-             system_ctrl.sfp_data.potencia_rx);
-    snprintf(info_items[11], sizeof(info_items[11]), "BIAS: %.1f mA", 
-             system_ctrl.sfp_data.corrente_bias);
-    
-    // Seção 4: Especificações técnicas
-    strcpy(info_items[12], "TEMP OPER: 0 a 70C");
-    strcpy(info_items[13], "TENSAO: 3.3V +/-10%");
-    strcpy(info_items[14], "CONECTOR: LC/UPC");*/
-    
-    const uint8_t total_items = 15;
+    const uint8_t total_items = 16;
     
     // Mostra indicadores de rolagem se necessário
     if (system_ctrl.scroll_position > 0) {
@@ -525,7 +408,7 @@ void draw_dados_info_screen(void) {
     uint8_t visible_count = 0;
     for (uint8_t i = 0; i < MAX_VISIBLE_ITEMS; i++) {
         uint8_t item_index = system_ctrl.scroll_position + i;
-        if (item_index >= total_items) break;
+         if (item_index >= total_items) break;
         
         uint8_t y_pos = start_y + (i * ITEM_HEIGHT);
         
@@ -592,11 +475,11 @@ void draw_diagnostico_screen(void) {
     
     // Status do sinal
     ssd1306_SetCursor(10, start_y + 15);
-    if (system_ctrl.sfp_data.potencia_rx < -30.0f) {
+    if (sfp_a2h_get_rx_power_dbm(&system_ctrl.sfp.a2) < -30.0f) {
         ssd1306_WriteString("SINAL MUITO FRACO", Font_6x8, White);
-    } else if (system_ctrl.sfp_data.potencia_rx < -20.0f) {
+    } else if (sfp_a2h_get_rx_power_dbm(&system_ctrl.sfp.a2) < -20.0f) {
         ssd1306_WriteString("SINAL FRACO", Font_6x8, White);
-    } else if (system_ctrl.sfp_data.potencia_rx > 0.0f) {
+    } else if (sfp_a2h_get_rx_power_dbm(&system_ctrl.sfp.a2) > 0.0f) {
         ssd1306_WriteString("SINAL ALTO", Font_6x8, White);
     } else {
         ssd1306_WriteString("SINAL NORMAL", Font_6x8, White);
@@ -713,6 +596,45 @@ void draw_monitoramento_screen(void) {
     }
 }
 
+
+void draw_error(const char* operacao){
+   // Desenha tela de erro
+    ssd1306_Fill(Black);
+    draw_header("ERRO DE LEITURA");
+    
+    // Ícone de erro (!)
+    ssd1306_SetCursor(60, HEADER_HEIGHT + 15);
+    ssd1306_WriteString("!", Font_11x18, White);
+    
+    // Mensagem de erro
+    char mensagem[40];
+    snprintf(mensagem, sizeof(mensagem), "Falha na %s", operacao);
+    
+    ssd1306_SetCursor(10, HEADER_HEIGHT + 40);
+    ssd1306_WriteString(mensagem, Font_6x8, White);
+    
+    ssd1306_SetCursor(15, HEADER_HEIGHT + 50);
+    ssd1306_WriteString("do modulo SFP", Font_6x8, White);
+    
+    // Rodapé
+    draw_footer("ENTER:Voltar ao Menu");
+    ssd1306_UpdateScreen();
+    
+    // Aguarda o botão ser pressionado
+    while (!joystickPi_read().button) {
+        sleep_ms(50);
+    }
+    
+    // Debounce
+    sleep_ms(200);
+    
+    // Volta para o menu principal com valores padrão
+    system_ctrl.current_state = STATE_MAIN_MENU;
+    system_ctrl.current_selection = 0;
+    system_ctrl.scroll_offset = 0;
+    system_ctrl.scroll_position = 0;
+}
+
 // ==================== CONTROLE DO JOYSTICK ====================
 
 /**
@@ -730,7 +652,7 @@ void process_joystick_input(void) {
     
     // Processa movimento no eixo Y (navegação vertical)
     if (current_time - system_ctrl.last_joystick_move > JOYSTICK_DEBOUNCE_MS) {
-        int16_t y_mapped = joystickPi_map_value(joystick.y, 0, 4095, -100, 100);
+        int16_t y_mapped = joystickPi_map_value(joystick.y, 0, 4095, 100, -100);
         
         // Movimento para cima
         if (y_mapped < -JOYSTICK_THRESHOLD) {

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
-set(PICO_SDK_PATH "/home/alexandrejunior/pico-sdk")
+set(PICO_SDK_PATH "C:\\pico-sdk")
 
 set(PICO_BOARD pico_w CACHE STRING "Board type")
 
@@ -15,7 +15,7 @@ project(main C CXX ASM)
 
 pico_sdk_init()
 
-add_executable(main main.c ssd1306/ssd1306.c ssd1306/ssd1306_fonts.c joystick/JoystickPi.c menu/menu.c I2C/i2c.c sfp_8472/a0h.c  sfp_8472/a2h.c)
+add_executable(main main.c ssd1306/ssd1306.c ssd1306/ssd1306_fonts.c joystick/JoystickPi.c menu/menu.c I2C/i2c.c sfp_8472/a0h.c  sfp_8472/a2h.c sfp_8472/sfp.c)
 
 pico_set_program_name(main "main.c")
 pico_set_program_version(main "0.1")

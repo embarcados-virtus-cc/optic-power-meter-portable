@@ -539,28 +539,126 @@ bool sfp_check_data_ready(uint8_t status_byte) {
     return false; // Módulo ainda não processou a primeira leitura A/D
 }
 
-/**
- * Lê e interpreta a tensão de alimentação (Vcc).
- * @param a2_data Buffer de 256 bytes contendo a página A2h.
- * @param vcc Ponteiro para armazenar o valor em Volts.
- * @return true se a leitura for válida, false caso contrário.
- */
-bool get_sfp_vcc(const uint8_t *a2_data, float *vcc) {
-    if (!a2_data || !vcc) return false;
+/* ============================================
+ * Byte 96-97 -Temperature
+ * ============================================ */
+void sfp_parse_a2h_temperature(const uint8_t *a2_data,sfp_a2h_t *a2){
+  if (!a2_data || !a2) {
+    return;
+  }
+  int16_t raw;
+  uint8_t msb = a2_data[A2_TEMP];
+  uint8_t lsb = a2_data[A2_TEMP + 1];
 
+  raw = (int16_t)(msb << 8 | lsb);
+  a2->temp = TEMP_TO_DEGC(raw);
 
-    /* Coerência de Dados
-       A especificação exige que campos multi-byte (como o Vcc nos bytes 98-99)
-       sejam recuperados usando uma sequência única de leitura de dois bytes
-       para garantir a consistência dos dados. */
-    uint16_t raw_vcc = (uint16_t)(a2_data[A2_VCC_CURR] << 8) | a2_data[ A2_VCC_CURR + 1];
-
-    /* 3. Interpretação (Calibração Interna)
-       O valor bruto (0-65535) representa a faixa de 0 a 6.55 V. */
-    *vcc = VCC_TO_VOLTS(raw_vcc);
-
-    return true;
 }
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_temperature(const sfp_a2h_t *a2)
+{
+  if (!a2) {
+    return -1;
+  }
+  return a2->temp;
+}
+
+/* ============================================
+ * Byte 98-99 -VCC
+ * ============================================ */
+void sfp_parse_a2h_vcc(const uint8_t *a2_data,sfp_a2h_t *a2){
+  if (!a2_data || !a2) {
+    return;
+  }
+  int16_t raw;
+  uint8_t msb = a2_data[A2_VCC];
+  uint8_t lsb = a2_data[A2_VCC + 1];
+
+  raw = (int16_t)(msb << 8 | lsb);
+  a2->vcc = VCC_TO_VOLTS(raw);
+
+}
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_vcc(const sfp_a2h_t *a2)
+{
+  if (!a2) {
+    return -1;
+  }
+  return a2->vcc;
+}
+
+
+/* ============================================
+ * Byte 100-101 -TX BIAS CURRENT
+ *
+ * ============================================ */
+void sfp_parse_a2h_tx_bias(const uint8_t *a2_data,sfp_a2h_t *a2){
+  
+  if (!a2_data || !a2) {
+    return;
+  }
+
+  uint16_t raw;
+  uint8_t msb = a2_data[A2_TX_BIAS];
+  uint8_t lsb = a2_data[A2_TX_BIAS+1];
+
+  raw = (uint16_t)((msb << 8 ) | lsb);
+  a2->tx_bias = TX_BIAS_TO_MA(raw);
+}
+
+float sfp_a2h_get_tx_bias(const sfp_a2h_t *a2){
+  if (!a2) {
+    return -1;
+  }
+  return a2->tx_bias;
+
+}
+
+/* ============================================
+ * Byte 102-103 -TX POWER
+ *
+ * ============================================ */
+
+void sfp_parse_a2h_tx_power(const uint8_t *a2_data,sfp_a2h_t *a2){
+
+  if (!a2_data || !a2) {
+    return;
+  }
+
+
+  uint16_t raw;
+  uint8_t msb = a2_data[A2_TX_POWER];
+  uint8_t lsb = a2_data[A2_TX_POWER+1];
+
+  raw = (uint16_t)((msb << 8 ) | lsb);
+  a2->tx_power = POWER_TO_UW(raw);
+}
+/* ============================================
+ * Função Getter
+ * ============================================ */
+float sfp_a2h_get_tx_power(const sfp_a2h_t *a2) {
+    if (!a2) {
+        return -1; /* Indica um erro */
+    }
+
+    return a2->tx_power;
+}
+float sfp_a2h_get_tx_power_dbm(const sfp_a2h_t *a2){
+  if (!a2) {
+    return -1;
+  }
+  float power_uW = a2->tx_power;
+  if (power_uW <=1.0f) { /* 0x01 é o valor mínimo do LSB */
+    return -40.0f;/*Piso condizente com a sensibilidade do Módulo*/
+  }else {
+    return 10.0f * log10f(power_uW /1000.0f);
+  }
+}
+
 
 /* ============================================
  * Byte 104-105 -RX_POWER
@@ -608,7 +706,7 @@ float sfp_a2h_get_rx_power_dbm(const sfp_a2h_t *a2){
     return -1;
   }
   float power_uW = a2->rx_power;
-  if (power_uW <=1.0f) { /* 0x01 é o valor mínimo do LSB */
+  if (power_uW <=0.0f) { /* 0x01 é o valor mínimo do LSB */
     return -40.0f;/*Piso condizente com a sensibilidade do Módulo*/
   }else {
     return 10.0f * log10f(power_uW /1000.0f);

@@ -462,8 +462,8 @@ typedef enum {
 
 typedef enum {
     SFP_CAL_NOT_SUPPORTED = 0,
-    SFP_CAL_INTERNAL,
-    SFP_CAL_EXTERNAL
+    SFP_CAL_INTERNAL = 1,
+    SFP_CAL_EXTERNAL= 3
 } sfp_cal_type_t;
 
 
@@ -652,7 +652,7 @@ uint32_t sfp_a0_get_om3_cable_length_m(const sfp_a0h_base_t *a0, sfp_om3_length_
 
 /* Bytes 20-35 Vendor Name */
 void sfp_parse_a0_base_vendor_name(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
-bool sfp_a0_get_vendor_name(const sfp_a0h_base_t *a0, char *vendor_name);
+const char *sfp_a0_get_vendor_name(const sfp_a0h_base_t *a0);
 
 /* Byte 36 — Extended Compliance Codes */
 void sfp_parse_a0_base_ext_compliance(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
@@ -665,11 +665,11 @@ uint32_t sfp_vendor_oui_to_u32(const sfp_a0h_base_t *a0);
 
 /*Byte 40-55 Vendor PN (Part Number)*/
 void sfp_parse_a0_base_vendor_pn(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
-bool sfp_a0_get_vendor_pn(const sfp_a0h_base_t *a0, const char **vendor_pn);
+const char *sfp_a0_get_vendor_pn(const sfp_a0h_base_t *a0);
 
 /*Byte 56-59 Vendor Rev */
 void sfp_parse_a0_base_vendor_rev(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);
-bool sfp_a0_get_vendor_rev(const sfp_a0h_base_t *a0, char *vendor_rev);
+const char *sfp_a0_get_vendor_rev(const sfp_a0h_base_t *a0);
 
 /* Bytes 60-61 — Wavelength (optical) OU Cable Compliance (active/passive) */
 void sfp_parse_a0_base_media(const uint8_t *a0_base_data, sfp_a0h_base_t *a0);

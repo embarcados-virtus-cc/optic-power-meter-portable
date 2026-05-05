@@ -32,12 +32,12 @@
 /**
  * @brief Pino ADC para leitura do eixo X do joystick.
  */
-#define JOYSTICK_X_PIN 26 // Pino ADC0 (GP26)
+#define JOYSTICK_X_PIN 27 // Pino ADC0 (GP26)
 
 /**
  * @brief Pino ADC para leitura do eixo Y do joystick.
  */
-#define JOYSTICK_Y_PIN 27 // Pino ADC1 (GP27)
+#define JOYSTICK_Y_PIN 26 // Pino ADC1 (GP27)
 
 /**
  * @brief Pino GPIO para leitura do botão do joystick.
