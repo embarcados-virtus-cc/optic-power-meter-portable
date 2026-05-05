@@ -10,7 +10,8 @@
 #include "ssd1306/ssd1306_fonts.h"
 #include "joystick/JoystickPi.h"
 #include "sfp_8472/a0h.h"
-
+#include "sfp_8472/a2h.h"
+#include "sfp_8472/sfp.h"
 // ==================== DEFINIÇÕES GERAIS ====================
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 64
@@ -80,6 +81,7 @@ typedef struct {
     uint32_t last_data_update;
     SFP_Data sfp_data;
     sfp_a0h_base_t a0;
+    sfp_t sfp;
     bool joystick_enabled;
     uint8_t scroll_position;
 } SystemControl;
@@ -106,6 +108,7 @@ void draw_dados_info_screen(void);
 void draw_diagnostico_screen(void);
 void draw_config_screen(void);
 void draw_monitoramento_screen(void);
+void draw_error(const char* operacao);
 
 // Controle do sistema
 void process_joystick_input(void);

@@ -10,8 +10,8 @@
 
 #if defined(SSD1306_USE_I2C)
 
-const uint8_t I2C_SDA_PIN = 14;
-const uint8_t I2C_SCL_PIN = 15;
+const uint8_t I2C_SDA_PIN = 10;
+const uint8_t I2C_SCL_PIN = 11;
 
 void ssd1306_Reset(void) {
     /* for I2C - do nothing */

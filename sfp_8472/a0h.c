@@ -971,25 +971,12 @@ void sfp_parse_a0_base_vendor_name(const uint8_t *a0_base_data, sfp_a0h_base_t *
 /* ============================================
  * Método Getter
  * ============================================ */
-bool sfp_a0_get_vendor_name(const sfp_a0h_base_t *a0, char *vendor_name)
+const char *sfp_a0_get_vendor_name(const sfp_a0h_base_t *a0)
 {
-    if (!vendor_name)
-        return false;
-
-    vendor_name[0] = '\0';
-
     if (!a0 || !a0->is_valid_vendor_name)
-        return false;
+        return "Invalid";
 
-    size_t len = SFP_A0_LEN_VENDOR_NAME;
-
-    while (len > 0 && a0->vendor_name[len - 1] == ' ')
-        len--;
-
-    memcpy(vendor_name, a0->vendor_name, len);
-    vendor_name[len] = '\0';
-
-    return true;
+    return a0->vendor_name;
 }
 
 /* ============================================
@@ -1069,14 +1056,13 @@ void sfp_parse_a0_base_vendor_pn(const uint8_t *a0_base_data, sfp_a0h_base_t *a0
     memcpy (a0->vendor_pn, &a0_base_data[A0_VENDOR_PN], 16);
 }
 
-bool sfp_a0_get_vendor_pn(const sfp_a0h_base_t *a0, const char **vendor_pn)
+const char *sfp_a0_get_vendor_pn(const sfp_a0h_base_t *a0)
 {
-    if (!a0 || !vendor_pn) {
-        return false;
+    if (!a0) {
+        return "Invalid";
     }
 
-    *vendor_pn = a0->vendor_pn;
-    return true;
+    return a0->vendor_pn;
 }
 
 
@@ -1092,17 +1078,13 @@ void sfp_parse_a0_base_vendor_rev(const uint8_t *a0_base_data, sfp_a0h_base_t *a
     a0->vendor_rev[4] = '\0';
 }
 
-bool sfp_a0_get_vendor_rev(const sfp_a0h_base_t *a0, char *vendor_rev)
+const char *sfp_a0_get_vendor_rev(const sfp_a0h_base_t *a0)
 {
-    if (!a0 || !vendor_rev) {
-        if (vendor_rev) {
-            *vendor_rev = '\0';
-        }
-        return false;
+    if (!a0) {
+        return "Invalid";
     }
 
-    strcpy(vendor_rev, a0->vendor_rev);
-    return true;
+    return a0->vendor_rev;
 }
 
 
@@ -1297,11 +1279,12 @@ void sfp_parse_a0_extended_calibration(const uint8_t *a0_data,sfp_a0h_extended_t
 
   if (byte92 & (1 << SFP_A0_BIT_INTERNAL_CAL)) {
         a0->calibration = SFP_CAL_INTERNAL;
-    }
-  if (byte92 & (1 << SFP_A0_BIT_EXTERNAL_CAL)) {
+  }else if(byte92 & (1 << SFP_A0_BIT_EXTERNAL_CAL)){
         a0->calibration = SFP_CAL_EXTERNAL;
-    }
-  a0->calibration = SFP_CAL_NOT_SUPPORTED;
+  }
+  else{
+    a0->calibration = SFP_CAL_NOT_SUPPORTED;
+  }
 }
 
 /* ============================================
