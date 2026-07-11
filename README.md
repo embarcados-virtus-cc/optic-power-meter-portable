@@ -253,8 +253,41 @@ main()
 | Navegação | Joystick analógico 5 vias — ADC 12-bit |
 | Build system | CMake 3.13+ · Pico SDK |
 | Saída de firmware | `main.uf2` — drag-and-drop via USB BOOTSEL |
+---
 
 ---
+### Placa de Circuito
+
+Para execução da solução é proposta uma placa de circuito que realiza as conexões 
+necessárias do sistema. A placa conta com trilhas de gerenciamento de energia, 
+roteamento de comunicação I²C e caminhos para leitura dos sinais analógicos do 
+joystick. Os arquivos do projeto da placa estão disponíveis no repositório.
+
+**Conector SFP:** a conexão com os pinos do módulo SFP é feita utilizando o 
+conector **1367073-1**, que permite o encaixe fácil do SFP e a distribuição dos 
+pinos de interesse em trilhas da placa.
+
+#### Esquemático
+
+<div align="center">
+<img width="600" alt="Esquemático completo" src="https://github.com/user-attachments/assets/ba41f1b8-4b4b-4256-ace0-9e6c4a45477e" />
+</div>
+
+**Placa de expansão — conector SFP**
+
+<div align="center">
+<img width="325" alt="Placa de expansão com conector SFP" src="https://github.com/user-attachments/assets/fac00329-13e7-4ebf-979e-5238d2f27735" />
+</div>
+
+#### Renderização 3D
+
+
+**Vista montada — frente e verso**
+
+<div align="center">
+<img width="250" alt="PCB montada frente" src="https://github.com/user-attachments/assets/7b9d4aa2-dbb7-4531-8862-9530cfa44068" />
+<img width="250" alt="PCB montada verso" src="https://github.com/user-attachments/assets/69cd73e8-5bba-4798-8f9b-7e73b2eb8dd7" />
+</div>
 
 ### Expansão planejada: outros protocolos
 
@@ -306,6 +339,9 @@ make -j4
 # Segure BOOTSEL ao conectar o USB
 # Copie build/main.uf2 para o volume "RPI-RP2" que aparecer
 ```
+
+
+
 
 ---
 
