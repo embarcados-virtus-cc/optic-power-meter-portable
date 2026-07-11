@@ -1,0 +1,10 @@
+Board Information Report
+Filename     : C:\Users\ygorp\Desktop\Faculdade\Virtus\Eletronica\Pedro\pedro2\PCB_Project\PCB_Project\Layout\PCB_Source_IoT.PcbDoc
+Date         : 06/07/2026
+Time         : 10:30:31
+Time Elapsed : 00:00:00
+
+General
+    Board Size, 110.0582mmx153.67mm
+    Components on board, 7
+count : 2
